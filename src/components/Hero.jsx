@@ -40,7 +40,8 @@ const Hero = () => {
         {/* Left Side: Text */}
         <motion.div
           className="flex-1 text-center md:text-left"
-          style={{ y: yBg, opacity: opacityText }}
+          style={{ y: yBg }}
+
         >
           <motion.h1
             className="text-5xl md:text-7xl lg:text-8xl font-black text-textPrimary tracking-tighter leading-[1.1] mb-6"
