@@ -1,0 +1,217 @@
+{
+  "name": "Awoyele Victor Ayomide",
+  "username": "Awoyelevictor",
+  "role": "Computer Science Student & Full-Stack Web Developer",
+  "location": "Nigeria",
+
+  "bio": "I am a Computer Science student and web developer passionate about building practical, modern, and user-focused digital solutions. I enjoy turning ideas into functional web applications and exploring how AI can solve real-world problems.",
+
+  "specialization": [
+    "Web Development",
+    "Frontend Development",
+    "Full-Stack Development",
+    "Artificial Intelligence",
+    "Software Engineering"
+  ],
+
+  "socials": {
+    "github": "https://github.com/Awoyelevictor",
+    "vercel": null
+  },
+
+  "technologies": {
+    "frontend": [
+      "React.js",
+      "JavaScript",
+      "HTML5",
+      "CSS3",
+      "Tailwind CSS",
+      "Vite"
+    ],
+    "backend": [
+      "Node.js",
+      "Express.js",
+      "Laravel"
+    ],
+    "database": [
+      "MongoDB",
+      "MySQL"
+    ],
+    "tools": [
+      "Git",
+      "GitHub",
+      "Vercel",
+      "Render",
+      "Figma"
+    ],
+    "ai": [
+      "Google Gemini",
+      "Large Language Models",
+      "AI-assisted Applications"
+    ]
+  },
+
+  "projects": [
+    {
+      "name": "Portfolio",
+      "description": "A personal portfolio website showcasing my skills, projects, experience, and development journey.",
+      "technologies": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "github": "https://github.com/Awoyelevictor/Portfolio",
+      "vercel": null
+    },
+
+    {
+      "name": "3D Website",
+      "description": "A modern interactive 3D web experience focused on immersive visual design and frontend development.",
+      "technologies": [
+        "JavaScript",
+        "Web Development",
+        "3D"
+      ],
+      "github": "https://github.com/Awoyelevictor/3dwebsite",
+      "vercel": null
+    },
+
+    {
+      "name": "E-commerce App with AI",
+      "description": "An e-commerce web application exploring the integration of artificial intelligence into online shopping experiences.",
+      "technologies": [
+        "JavaScript",
+        "AI",
+        "E-commerce",
+        "Web Development"
+      ],
+      "github": "https://github.com/Awoyelevictor/E-commerce-App-with-AI",
+      "vercel": null
+    },
+
+    {
+      "name": "Health Management System",
+      "description": "A web-based health management application designed to organize health-related information and workflows.",
+      "technologies": [
+        "React.js",
+        "Tailwind CSS"
+      ],
+      "github": "https://github.com/Awoyelevictor/hms",
+      "vercel": null
+    },
+
+    {
+      "name": "Inventory Management System",
+      "description": "A web application for managing products, inventory records, and stock-related operations.",
+      "technologies": [
+        "React.js",
+        "JavaScript",
+        "Web Development"
+      ],
+      "github": "https://github.com/Awoyelevictor/inventory",
+      "vercel": null
+    },
+
+    {
+      "name": "VideoSense",
+      "description": "A web project focused on working with video-based functionality and digital media.",
+      "technologies": [
+        "JavaScript",
+        "Web Development"
+      ],
+      "github": "https://github.com/Awoyelevictor/VideoSense-",
+      "vercel": null
+    },
+
+    {
+      "name": "TaskWise",
+      "description": "A productivity-focused web application for organizing and managing tasks.",
+      "technologies": [
+        "JavaScript",
+        "Web Development"
+      ],
+      "github": "https://github.com/Awoyelevictor/taskwise",
+      "vercel": null
+    },
+
+    {
+      "name": "Weather App",
+      "description": "A weather application that provides users with weather information through a simple web interface.",
+      "technologies": [
+        "JavaScript",
+        "API",
+        "Web Development"
+      ],
+      "github": "https://github.com/Awoyelevictor/weather4two",
+      "vercel": null
+    },
+
+    {
+      "name": "Terminal Portfolio",
+      "description": "A unique terminal-inspired portfolio experience designed around a command-line interface.",
+      "technologies": [
+        "JavaScript",
+        "Terminal UI",
+        "Web Development"
+      ],
+      "github": "https://github.com/Awoyelevictor/terminal-portfolio",
+      "vercel": null
+    },
+
+    {
+      "name": "Steps Tracker",
+      "description": "A web application for tracking walking activity and visualizing movement-related information.",
+      "technologies": [
+        "JavaScript",
+        "Web Development",
+        "Maps"
+      ],
+      "github": "https://github.com/Awoyelevictor/steps-tracker-app",
+      "vercel": null
+    }
+  ],
+
+  "featuredProjects": [
+    "E-commerce App with AI",
+    "Health Management System",
+    "Inventory Management System",
+    "3D Website",
+    "Terminal Portfolio"
+  ],
+
+  "experience": {
+    "role": "Web Development Intern",
+    "focus": [
+      "Frontend Development",
+      "React.js",
+      "Responsive UI Development",
+      "Git & GitHub",
+      "Team Collaboration",
+      "Web Application Development"
+    ]
+  },
+
+  "careerGoals": [
+    "Become a highly skilled full-stack developer",
+    "Build impactful software products",
+    "Explore AI and intelligent applications",
+    "Solve real-world problems through technology",
+    "Build scalable web applications"
+  ],
+
+  "interests": [
+    "Software Development",
+    "Artificial Intelligence",
+    "Cybersecurity",
+    "Web Technologies",
+    "Open Source",
+    "Problem Solving"
+  ],
+
+  "availability": [
+    "Freelance Projects",
+    "Web Development",
+    "Collaborations",
+    "Software Projects"
+  ]
+}

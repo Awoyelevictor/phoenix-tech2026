@@ -1,0 +1,4 @@
+/* Navbar styles handled by Tailwind - keeping file for potential overrides */
+li {
+  list-style: none;
+}
