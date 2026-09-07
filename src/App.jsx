@@ -38,7 +38,7 @@ function PortfolioApp() {
       </AnimatePresence>
 
       {!loading && portfolio && ( // Render only when not loading and portfolio data is available
-        <div className="perspective-container h-screen overflow-x-hidden overflow-y-auto">
+        <div className="perspective-container overflow-x-hidden">
           <motion.div 
             className="preserve-3d min-h-screen"
             style={{ 

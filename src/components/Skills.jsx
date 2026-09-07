@@ -1,32 +1,18 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from 'framer-motion';
 
 const Skills = ({ technologies, specialization }) => {
   if (!technologies) return null;
 
-  const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "center center"]
-  });
-
-  // Subtle 3D tilt for the whole section
-  const rotateX = useTransform(scrollYProgress, [0, 1], [6, 0]);
-  const translateZ = useTransform(scrollYProgress, [0, 1], [-80, 0]);
-  const sectionOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
-
   return (
-    <section ref={sectionRef} className="py-32 px-6 relative z-10 max-w-7xl mx-auto">
+    <section className="py-32 px-6 relative z-10 max-w-7xl mx-auto">
       {/* Section divider */}
       <div className="section-divider mb-32" />
 
       <motion.div
-        style={{
-          rotateX,
-          translateZ,
-          opacity: sectionOpacity,
-          transformStyle: 'preserve-3d',
-        }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8 }}
       >
         {/* Section header */}
         <motion.div
@@ -55,9 +41,9 @@ const Skills = ({ technologies, specialization }) => {
               {specialization?.map((spec, idx) => (
                 <motion.div 
                   key={idx}
-                  initial={{ opacity: 0, x: -20, rotateY: -5 }}
-                  whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-                  viewport={{ once: true }}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
                   transition={{ 
                     delay: idx * 0.08, 
                     duration: 0.6,
@@ -85,9 +71,9 @@ const Skills = ({ technologies, specialization }) => {
               {Object.entries(technologies).map(([category, items], catIdx) => (
                 <motion.div 
                   key={category}
-                  initial={{ opacity: 0, y: 15, rotateX: 5 }}
-                  whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                  viewport={{ once: true }}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
                   transition={{ 
                     delay: catIdx * 0.1, 
                     duration: 0.6,
