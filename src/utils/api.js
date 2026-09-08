@@ -1,4 +1,8 @@
-const API_BASE_URL = 'http://localhost:5001/api';
+// Use relative URL so it works on both localhost and production (Render)
+// When served from Express, /api calls go to the same server
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';
 
 // --- Contact & Messages ---
 export const sendContactMessage = async (formData) => {

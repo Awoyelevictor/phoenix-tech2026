@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "render-build": "npm install && npm run build && cd server && npm install",
+    "start": "node server/server.js"
   },
   "dependencies": {
     "framer-motion": "^13.1.1",
