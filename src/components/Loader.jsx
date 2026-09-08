@@ -5,11 +5,11 @@ const Loader = ({ onComplete }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    // Hide loader after animation completes (e.g., 2.5 seconds)
+    // Hide loader after snappy intro animation completes
     const timer = setTimeout(() => {
       setIsVisible(false);
       if (onComplete) onComplete();
-    }, 2500);
+    }, 1400);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
@@ -20,8 +20,9 @@ const Loader = ({ onComplete }) => {
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 0.8, delay: 1.7, ease: "easeInOut" }}
-      className="fixed inset-0 z-[99999] flex items-center justify-center bg-darkBg overflow-hidden"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, delay: 0.9, ease: "easeInOut" }}
+      className="fixed inset-0 z-[99999] pointer-events-none flex items-center justify-center bg-darkBg overflow-hidden"
     >
       <div className="relative flex items-center justify-center">
         {/* Animated text/logo */}

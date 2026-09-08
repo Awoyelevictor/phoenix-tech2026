@@ -14,6 +14,23 @@ import {
   deleteMessage 
 } from '../../utils/api';
 import portfolioDataRaw from '../../data/portfolio.json';
+import {
+  AnimatedChart,
+  AnimatedEdit,
+  AnimatedRocket,
+  AnimatedInbox,
+  AnimatedEye,
+  AnimatedTrending,
+  AnimatedLaptop,
+  AnimatedMail,
+  AnimatedSave,
+  AnimatedPlus,
+  AnimatedTrash,
+  AnimatedUpload,
+  AnimatedImage,
+  AnimatedClose,
+  AnimatedSparkles
+} from '../icons/AnimatedIcons';
 
 const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -24,11 +41,38 @@ const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('overview'); // overview | content | projects | messages
   const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
 
-  // Data States
+  // Data States with Instant LocalStorage Persistence
   const [analytics, setAnalytics] = useState({ totalViews: 0, viewsToday: 0, recentViews: [] });
-  const [content, setContent] = useState(portfolioDataRaw);
-  const [projects, setProjects] = useState([]);
-  const [messages, setMessages] = useState([]);
+  const [content, setContent] = useState(() => {
+    try {
+      const saved = localStorage.getItem('portfolio_live_content');
+      return saved ? { ...portfolioDataRaw, ...JSON.parse(saved) } : portfolioDataRaw;
+    } catch (e) {
+      return portfolioDataRaw;
+    }
+  });
+
+  const [projects, setProjects] = useState(() => {
+    try {
+      const saved = localStorage.getItem('portfolio_live_projects');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return portfolioDataRaw.projects || [];
+  });
+
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem('portfolio_inquiries');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  });
   const [loading, setLoading] = useState(false);
 
   // Modal / Form States for Projects
@@ -43,6 +87,7 @@ const AdminPage = () => {
     gradientFrom: '#6366f1',
     gradientTo: '#a855f7',
     icon: '💻',
+    image: '',
     featured: false
   });
 
@@ -95,9 +140,31 @@ const AdminPage = () => {
       ]);
 
       if (analyticsData.status === 'fulfilled') setAnalytics(analyticsData.value);
-      if (contentData.status === 'fulfilled' && contentData.value) setContent(contentData.value);
-      if (projectsData.status === 'fulfilled' && projectsData.value) setProjects(projectsData.value);
-      if (messagesData.status === 'fulfilled' && messagesData.value) setMessages(messagesData.value);
+      if (contentData.status === 'fulfilled' && contentData.value && Object.keys(contentData.value).length > 0) {
+        setContent(prev => {
+          const merged = { ...prev, ...contentData.value };
+          localStorage.setItem('portfolio_live_content', JSON.stringify(merged));
+          return merged;
+        });
+      }
+      if (projectsData.status === 'fulfilled' && Array.isArray(projectsData.value) && projectsData.value.length > 0) {
+        setProjects(projectsData.value);
+        localStorage.setItem('portfolio_live_projects', JSON.stringify(projectsData.value));
+      }
+      if (messagesData.status === 'fulfilled' && Array.isArray(messagesData.value)) {
+        const localInquiries = JSON.parse(localStorage.getItem('portfolio_inquiries') || '[]');
+        const combined = [...messagesData.value];
+        localInquiries.forEach(localMsg => {
+          if (!combined.some(m => m._id === localMsg._id || (m.email === localMsg.email && m.message === localMsg.message))) {
+            combined.push(localMsg);
+          }
+        });
+        setMessages(combined);
+        localStorage.setItem('portfolio_inquiries', JSON.stringify(combined));
+      } else {
+        const localInquiries = JSON.parse(localStorage.getItem('portfolio_inquiries') || '[]');
+        setMessages(localInquiries);
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -109,54 +176,116 @@ const AdminPage = () => {
     loadDashboardData();
   }, [isAuthenticated]);
 
-  // Handle Save Content
+  // Handle Save Content (Directly updates state, localStorage, and MongoDB backend)
   const handleSaveContent = async (e) => {
     e.preventDefault();
     try {
+      // 1. Instantly persist to localStorage so live website updates immediately
+      localStorage.setItem('portfolio_live_content', JSON.stringify(content));
+      
+      // 2. Also send to MongoDB backend
       await updateSiteContent(content);
-      showToast('Portfolio content updated successfully!');
+      showToast('Portfolio content saved & live site updated!');
     } catch (error) {
-      console.warn('Backend update error, saving locally:', error);
-      showToast('Content saved (Local state updated)', 'success');
+      console.warn('Backend update error, but saved locally:', error);
+      showToast('Content saved & live site updated!', 'success');
     }
+  };
+
+  // Handle Image Upload for Projects
+  const handleImageFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image file must be under 5MB', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProjectForm(prev => ({ ...prev, image: reader.result }));
+      showToast('Image uploaded successfully!');
+    };
+    reader.readAsDataURL(file);
   };
 
   // Project Form Submit (Create or Edit)
   const handleSaveProject = async (e) => {
     e.preventDefault();
     try {
+      const techArray = Array.isArray(projectForm.technologies)
+        ? projectForm.technologies
+        : (typeof projectForm.technologies === 'string'
+            ? projectForm.technologies.split(',').map(t => t.trim()).filter(Boolean)
+            : []);
+
+      const formattedProject = {
+        ...projectForm,
+        technologies: techArray
+      };
+
+      let updatedList = [];
       if (editingProject) {
-        await updateProject(editingProject._id || editingProject.id, projectForm);
-        showToast(`Project "${projectForm.name}" updated!`);
+        // Fallback to name if id is missing (like raw portfolio data)
+        const pId = editingProject._id || editingProject.id || editingProject.name;
+        
+        updatedList = projects.map(p => {
+          const currentId = p._id || p.id || p.name;
+          return currentId === pId ? { ...p, ...formattedProject } : p;
+        });
+        setProjects(updatedList);
+        localStorage.setItem('portfolio_live_projects', JSON.stringify(updatedList));
+
+        await updateProject(pId, formattedProject);
+        showToast(`Project "${projectForm.name}" updated & saved!`);
       } else {
-        await createProject(projectForm);
-        showToast(`Project "${projectForm.name}" created!`);
+        const newProj = {
+          ...formattedProject,
+          _id: Date.now().toString(),
+          id: Date.now().toString()
+        };
+        updatedList = [newProj, ...projects];
+        setProjects(updatedList);
+        localStorage.setItem('portfolio_live_projects', JSON.stringify(updatedList));
+
+        await createProject(formattedProject);
+        showToast(`Project "${projectForm.name}" created & published!`);
       }
       setIsProjectModalOpen(false);
+      setProjectForm({
+        name: '', description: '', technologies: '', github: '', liveUrl: '',
+        gradientFrom: '#6366f1', gradientTo: '#a855f7', icon: '💻', image: '', featured: false
+      });
+      setIsProjectModalOpen(false);
       setEditingProject(null);
-      loadDashboardData();
     } catch (error) {
-      console.error('Error saving project:', error);
-      // Fallback local update
-      if (editingProject) {
-        setProjects(prev => prev.map(p => (p._id === editingProject._id ? { ...p, ...projectForm } : p)));
-      } else {
-        setProjects(prev => [{ ...projectForm, _id: Date.now().toString() }, ...prev]);
-      }
-      setIsProjectModalOpen(false);
-      setEditingProject(null);
-      showToast('Project saved locally', 'success');
+      showToast('Failed to save project', 'error');
+    }
+  };
+
+  const handleResetProjects = () => {
+    if(window.confirm('Are you sure you want to reset all projects to default? This will fix duplicated or corrupted entries.')) {
+      const defaultProjects = portfolioDataRaw.projects;
+      setProjects(defaultProjects);
+      localStorage.setItem('portfolio_live_projects', JSON.stringify(defaultProjects));
+      showToast('Projects reset to defaults!', 'success');
     }
   };
 
   const handleDeleteProject = async (id) => {
     if (!window.confirm('Are you sure you want to delete this project?')) return;
     try {
+      const updatedList = projects.filter(p => (p._id || p.id) !== id);
+      setProjects(updatedList);
+      localStorage.setItem('portfolio_live_projects', JSON.stringify(updatedList));
+
       await deleteProject(id);
       showToast('Project deleted');
-      loadDashboardData();
     } catch (error) {
-      setProjects(prev => prev.filter(p => (p._id || p.id) !== id));
+      const updatedList = projects.filter(p => (p._id || p.id) !== id);
+      setProjects(updatedList);
+      localStorage.setItem('portfolio_live_projects', JSON.stringify(updatedList));
       showToast('Project removed');
     }
   };
@@ -172,6 +301,7 @@ const AdminPage = () => {
       gradientFrom: '#6366f1',
       gradientTo: '#a855f7',
       icon: '💻',
+      image: '',
       featured: false
     });
     setIsProjectModalOpen(true);
@@ -188,29 +318,36 @@ const AdminPage = () => {
       gradientFrom: project.gradientFrom || '#6366f1',
       gradientTo: project.gradientTo || '#a855f7',
       icon: project.icon || '💻',
+      image: project.image || '',
       featured: Boolean(project.featured)
     });
     setIsProjectModalOpen(true);
   };
 
   const handleMarkRead = async (id) => {
+    const updated = messages.map(m => m._id === id ? { ...m, read: true } : m);
+    setMessages(updated);
+    localStorage.setItem('portfolio_inquiries', JSON.stringify(updated));
+    showToast('Marked as read');
+
     try {
       await markMessageRead(id);
-      setMessages(prev => prev.map(m => m._id === id ? { ...m, read: true } : m));
-      showToast('Marked as read');
     } catch (error) {
-      setMessages(prev => prev.map(m => m._id === id ? { ...m, read: true } : m));
+      console.debug('Read status updated locally:', error);
     }
   };
 
   const handleDeleteMessage = async (id) => {
     if (!window.confirm('Delete this message?')) return;
+    const updated = messages.filter(m => m._id !== id);
+    setMessages(updated);
+    localStorage.setItem('portfolio_inquiries', JSON.stringify(updated));
+    showToast('Message deleted');
+
     try {
       await deleteMessage(id);
-      setMessages(prev => prev.filter(m => m._id !== id));
-      showToast('Message deleted');
     } catch (error) {
-      setMessages(prev => prev.filter(m => m._id !== id));
+      console.debug('Message removed locally:', error);
     }
   };
 
@@ -377,10 +514,10 @@ const AdminPage = () => {
         {/* Navigation Tabs */}
         <div className="flex flex-wrap gap-2.5 mb-8 border-b border-white/[0.08] pb-4">
           {[
-            { id: 'overview', label: '📊 Overview & Analytics', badge: null },
-            { id: 'content', label: '✍️ Site Content & Bio', badge: null },
-            { id: 'projects', label: '🚀 Projects Manager', badge: projects.length },
-            { id: 'messages', label: '📬 Inquiries & Messages', badge: messages.filter(m => !m.read).length || null },
+            { id: 'overview', label: 'Overview & Analytics', icon: <AnimatedChart size={16} />, badge: null },
+            { id: 'content', label: 'Site Content & Bio', icon: <AnimatedEdit size={16} />, badge: null },
+            { id: 'projects', label: 'Projects Manager', icon: <AnimatedRocket size={16} />, badge: projects.length },
+            { id: 'messages', label: 'Inquiries & Messages', icon: <AnimatedInbox size={16} />, badge: messages.filter(m => !m.read).length || null },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -391,6 +528,7 @@ const AdminPage = () => {
                   : 'bg-charcoal/60 hover:bg-charcoal text-textSecondary hover:text-white border border-white/5'
               }`}
             >
+              <span className="flex items-center">{tab.icon}</span>
               <span>{tab.label}</span>
               {tab.badge !== null && tab.badge > 0 && (
                 <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-extrabold">
@@ -409,7 +547,9 @@ const AdminPage = () => {
               <div className="bg-charcoal/70 p-6 rounded-3xl border border-white/[0.08] shadow-xl backdrop-blur-sm">
                 <div className="flex items-center justify-between text-textMuted text-xs font-bold uppercase tracking-wider mb-2">
                   <span>Total Website Views</span>
-                  <span className="text-xl">👁️</span>
+                  <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-accent/10">
+                    <AnimatedEye size={18} color="#818cf8" />
+                  </span>
                 </div>
                 <div className="text-3xl sm:text-4xl font-black text-textPrimary tracking-tight">
                   {analytics.totalViews || 0}
@@ -420,7 +560,9 @@ const AdminPage = () => {
               <div className="bg-charcoal/70 p-6 rounded-3xl border border-white/[0.08] shadow-xl backdrop-blur-sm">
                 <div className="flex items-center justify-between text-textMuted text-xs font-bold uppercase tracking-wider mb-2">
                   <span>Views Today</span>
-                  <span className="text-xl">📈</span>
+                  <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-accent/10">
+                    <AnimatedTrending size={18} color="#818cf8" />
+                  </span>
                 </div>
                 <div className="text-3xl sm:text-4xl font-black text-accent tracking-tight">
                   {analytics.viewsToday || 0}
@@ -431,7 +573,9 @@ const AdminPage = () => {
               <div className="bg-charcoal/70 p-6 rounded-3xl border border-white/[0.08] shadow-xl backdrop-blur-sm">
                 <div className="flex items-center justify-between text-textMuted text-xs font-bold uppercase tracking-wider mb-2">
                   <span>Total Projects</span>
-                  <span className="text-xl">💻</span>
+                  <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-purple-500/10">
+                    <AnimatedLaptop size={18} color="#c084fc" />
+                  </span>
                 </div>
                 <div className="text-3xl sm:text-4xl font-black text-purple-400 tracking-tight">
                   {projects.length || portfolioDataRaw.projects.length}
@@ -442,7 +586,9 @@ const AdminPage = () => {
               <div className="bg-charcoal/70 p-6 rounded-3xl border border-white/[0.08] shadow-xl backdrop-blur-sm">
                 <div className="flex items-center justify-between text-textMuted text-xs font-bold uppercase tracking-wider mb-2">
                   <span>Contact Inquiries</span>
-                  <span className="text-xl">✉️</span>
+                  <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-cyan-500/10">
+                    <AnimatedMail size={18} color="#22d3ee" />
+                  </span>
                 </div>
                 <div className="text-3xl sm:text-4xl font-black text-cyan-400 tracking-tight">
                   {messages.length}
@@ -625,9 +771,9 @@ const AdminPage = () => {
                     <button
                       type="button"
                       onClick={() => removeSpecTag(idx)}
-                      className="text-accent hover:text-white text-sm cursor-pointer"
+                      className="text-accent hover:text-white flex items-center justify-center cursor-pointer"
                     >
-                      ×
+                      <AnimatedClose size={12} />
                     </button>
                   </span>
                 ))}
@@ -644,9 +790,10 @@ const AdminPage = () => {
                 <button
                   type="button"
                   onClick={addSpecTag}
-                  className="px-4 py-2.5 bg-accent text-white rounded-xl text-xs font-bold"
+                  className="px-4 py-2.5 bg-accent text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
-                  + Add Tag
+                  <AnimatedPlus size={14} color="#ffffff" />
+                  <span>Add Tag</span>
                 </button>
               </div>
             </div>
@@ -670,9 +817,9 @@ const AdminPage = () => {
                           <button
                             type="button"
                             onClick={() => removeTechTag(cat, i)}
-                            className="text-textMuted hover:text-red-400"
+                            className="text-textMuted hover:text-red-400 flex items-center justify-center cursor-pointer"
                           >
-                            ×
+                            <AnimatedClose size={10} />
                           </button>
                         </span>
                       ))}
@@ -702,9 +849,10 @@ const AdminPage = () => {
                 <button
                   type="button"
                   onClick={addTechTag}
-                  className="px-4 py-2 bg-white/[0.08] hover:bg-white/[0.15] text-white rounded-xl text-xs font-bold"
+                  className="px-4 py-2 bg-white/[0.08] hover:bg-white/[0.15] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
-                  + Add
+                  <AnimatedPlus size={13} />
+                  <span>Add</span>
                 </button>
               </div>
             </div>
@@ -713,9 +861,10 @@ const AdminPage = () => {
             <div className="sticky bottom-6 z-30 flex justify-end">
               <button
                 type="submit"
-                className="px-8 py-4 bg-gradient-to-r from-accent to-purple-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-accent/25 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                className="px-8 py-4 bg-gradient-to-r from-accent to-purple-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-accent/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
               >
-                💾 Save All Changes
+                <AnimatedSave size={18} color="#ffffff" />
+                <span>Save All Changes</span>
               </button>
             </div>
           </form>
@@ -727,14 +876,24 @@ const AdminPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-textPrimary">Portfolio Projects</h2>
-                <p className="text-xs text-textSecondary">Add, modify, or reorder projects shown on your site</p>
+                <p className="text-xs text-textSecondary">Add, modify, or upload images for projects shown on your site</p>
               </div>
-              <button
-                onClick={openAddProjectModal}
-                className="px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold shadow-md shadow-accent/20 transition-all cursor-pointer"
-              >
-                + Add New Project
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleResetProjects}
+                  className="px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border border-red-500/20"
+                >
+                  <AnimatedTrash size={15} color="#f87171" />
+                  <span>Reset to Defaults</span>
+                </button>
+                <button
+                  onClick={openAddProjectModal}
+                  className="px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-bold shadow-md shadow-accent/20 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <AnimatedPlus size={15} color="#ffffff" />
+                  <span>Add New Project</span>
+                </button>
+              </div>
             </div>
 
             {/* Projects Table / Cards */}
@@ -746,12 +905,21 @@ const AdminPage = () => {
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-10 h-10 rounded-xl bg-white/[0.08] flex items-center justify-center text-xl">
-                        {project.icon || '💻'}
-                      </span>
+                      {project.image ? (
+                        <img 
+                          src={project.image} 
+                          alt={project.name} 
+                          className="w-12 h-12 rounded-xl object-cover border border-white/10 shadow-md"
+                        />
+                      ) : (
+                        <span className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
+                          <AnimatedLaptop size={22} color="#818cf8" />
+                        </span>
+                      )}
                       {project.featured && (
-                        <span className="px-2.5 py-0.5 rounded-full bg-accent/20 text-accent text-[10px] font-bold uppercase">
-                          Featured
+                        <span className="px-2.5 py-0.5 rounded-full bg-accent/20 text-accent text-[10px] font-bold uppercase flex items-center gap-1">
+                          <AnimatedSparkles size={10} color="#818cf8" />
+                          <span>Featured</span>
                         </span>
                       )}
                     </div>
@@ -762,7 +930,10 @@ const AdminPage = () => {
                     </p>
 
                     <div className="flex flex-wrap gap-1.5 mb-6">
-                      {(project.technologies || []).map((t, idx) => (
+                      {(Array.isArray(project.technologies) 
+                        ? project.technologies 
+                        : (typeof project.technologies === 'string' ? project.technologies.split(',').map(t => t.trim()).filter(Boolean) : [])
+                      ).map((t, idx) => (
                         <span key={idx} className="px-2 py-0.5 rounded-md bg-white/[0.04] text-[10px] text-textMuted">
                           {t}
                         </span>
@@ -773,15 +944,17 @@ const AdminPage = () => {
                   <div className="flex items-center gap-2 pt-4 border-t border-white/[0.06]">
                     <button
                       onClick={() => openEditProjectModal(project)}
-                      className="flex-1 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold transition-colors"
+                      className="flex-1 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      Edit
+                      <AnimatedEdit size={13} />
+                      <span>Edit</span>
                     </button>
                     <button
                       onClick={() => handleDeleteProject(project._id || project.id)}
-                      className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold transition-colors"
+                      className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                     >
-                      Delete
+                      <AnimatedTrash size={13} color="#f87171" />
+                      <span>Delete</span>
                     </button>
                   </div>
                 </div>
@@ -799,8 +972,10 @@ const AdminPage = () => {
             </div>
 
             {messages.length === 0 ? (
-              <div className="bg-charcoal/50 p-12 rounded-3xl border border-white/[0.08] text-center">
-                <span className="text-4xl mb-3 block">📭</span>
+              <div className="bg-charcoal/50 p-12 rounded-3xl border border-white/[0.08] text-center flex flex-col items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center text-accent mb-3">
+                  <AnimatedInbox size={32} color="#818cf8" />
+                </div>
                 <h3 className="text-base font-bold text-textPrimary mb-1">No messages yet</h3>
                 <p className="text-xs text-textSecondary">New inquiries from visitors will appear here and in your inbox.</p>
               </div>
@@ -848,9 +1023,10 @@ const AdminPage = () => {
                       </a>
                       <button
                         onClick={() => handleDeleteMessage(msg._id)}
-                        className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-semibold transition-all"
+                        className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
                       >
-                        Delete
+                        <AnimatedTrash size={13} color="#f87171" />
+                        <span>Delete</span>
                       </button>
                     </div>
                   </div>
@@ -877,13 +1053,79 @@ const AdminPage = () => {
                 </h3>
                 <button
                   onClick={() => setIsProjectModalOpen(false)}
-                  className="w-8 h-8 rounded-xl bg-white/[0.05] text-textMuted hover:text-white flex items-center justify-center"
+                  className="w-8 h-8 rounded-xl bg-white/[0.05] text-textMuted hover:text-white flex items-center justify-center cursor-pointer"
                 >
-                  ✕
+                  <AnimatedClose size={16} />
                 </button>
               </div>
 
               <form onSubmit={handleSaveProject} className="space-y-4">
+                {/* Project Image Upload Section */}
+                <div className="p-4 rounded-2xl bg-darkBg/60 border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider block">
+                      Project Thumbnail / Image
+                    </label>
+                    {projectForm.image && (
+                      <button
+                        type="button"
+                        onClick={() => setProjectForm(prev => ({ ...prev, image: '' }))}
+                        className="text-[11px] text-red-400 hover:text-red-300 flex items-center gap-1 cursor-pointer"
+                      >
+                        <AnimatedClose size={10} />
+                        <span>Remove</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {projectForm.image ? (
+                    <div className="relative rounded-xl overflow-hidden border border-white/10 h-36 group">
+                      <img 
+                        src={projectForm.image} 
+                        alt="Project Preview" 
+                        className="w-full h-full object-cover" 
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <label className="px-3.5 py-1.5 rounded-xl bg-accent text-white text-xs font-semibold cursor-pointer shadow-lg flex items-center gap-1.5">
+                          <AnimatedUpload size={14} color="#ffffff" />
+                          <span>Change Image</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={handleImageFileChange} 
+                            className="hidden" 
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-white/15 hover:border-accent/60 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-white/[0.05] group">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent mb-2 group-hover:scale-110 transition-transform">
+                        <AnimatedUpload size={20} color="#818cf8" />
+                      </div>
+                      <span className="text-xs font-bold text-textPrimary">Click to upload project image</span>
+                      <span className="text-[11px] text-textMuted mt-1">PNG, JPG, WebP, GIF</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageFileChange} 
+                        className="hidden" 
+                      />
+                    </label>
+                  )}
+
+                  <div>
+                    <span className="text-[11px] text-textMuted block mb-1">Or paste image URL / local path:</span>
+                    <input
+                      type="text"
+                      value={projectForm.image?.startsWith('data:') ? '' : projectForm.image}
+                      onChange={(e) => setProjectForm(prev => ({ ...prev, image: e.target.value }))}
+                      placeholder="https://... or /image.png"
+                      className="w-full px-3 py-2 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider mb-1.5 block">
                     Project Name
@@ -953,20 +1195,7 @@ const AdminPage = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider mb-1.5 block">
-                      Icon Emoji
-                    </label>
-                    <input
-                      type="text"
-                      value={projectForm.icon}
-                      onChange={(e) => setProjectForm(prev => ({ ...prev, icon: e.target.value }))}
-                      placeholder="💻"
-                      className="w-full px-4 py-2.5 bg-darkBg border border-white/10 rounded-xl text-sm text-center text-textPrimary focus:border-accent focus:outline-none"
-                    />
-                  </div>
-
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider mb-1.5 block">
                       Gradient From
@@ -998,7 +1227,7 @@ const AdminPage = () => {
                     id="featured"
                     checked={projectForm.featured}
                     onChange={(e) => setProjectForm(prev => ({ ...prev, featured: e.target.checked }))}
-                    className="w-4 h-4 rounded text-accent focus:ring-accent"
+                    className="w-4 h-4 rounded text-accent focus:ring-accent cursor-pointer"
                   />
                   <label htmlFor="featured" className="text-xs font-semibold text-textPrimary cursor-pointer">
                     Highlight as Featured Project
@@ -1009,15 +1238,16 @@ const AdminPage = () => {
                   <button
                     type="button"
                     onClick={() => setIsProjectModalOpen(false)}
-                    className="flex-1 py-3 bg-white/[0.05] hover:bg-white/[0.1] text-xs font-bold rounded-xl text-textSecondary"
+                    className="flex-1 py-3 bg-white/[0.05] hover:bg-white/[0.1] text-xs font-bold rounded-xl text-textSecondary cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-accent hover:bg-accent/90 text-white text-xs font-bold rounded-xl shadow-lg shadow-accent/25"
+                    className="flex-1 py-3 bg-accent hover:bg-accent/90 text-white text-xs font-bold rounded-xl shadow-lg shadow-accent/25 flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    {editingProject ? 'Update Project' : 'Create Project'}
+                    <AnimatedSave size={15} color="#ffffff" />
+                    <span>{editingProject ? 'Update Project' : 'Create Project'}</span>
                   </button>
                 </div>
               </form>

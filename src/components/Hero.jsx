@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { AnimatedCode, AnimatedBot, AnimatedZap } from './icons/AnimatedIcons';
 
 const Hero = () => {
   const containerRef = useRef(null);
@@ -178,8 +179,8 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="absolute -left-4 top-12 sm:top-16 z-20 px-4 py-2.5 rounded-2xl glass-card border border-white/15 shadow-xl flex items-center gap-3 backdrop-blur-xl hover:scale-105 transition-transform"
           >
-            <span className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">
-              ⚛️
+            <span className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+              <AnimatedCode size={18} color="#22d3ee" />
             </span>
             <div>
               <p className="text-xs font-semibold text-textPrimary">Frontend Core</p>
@@ -195,8 +196,8 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.55 }}
             className="absolute -right-4 top-1/2 z-20 px-4 py-2.5 rounded-2xl glass-card border border-white/15 shadow-xl flex items-center gap-3 backdrop-blur-xl hover:scale-105 transition-transform"
           >
-            <span className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm">
-              🤖
+            <span className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+              <AnimatedBot size={18} color="#c084fc" />
             </span>
             <div>
               <p className="text-xs font-semibold text-textPrimary">AI Powered</p>
@@ -212,8 +213,8 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.7 }}
             className="absolute left-6 -bottom-6 z-20 px-4 py-2.5 rounded-2xl glass-card border border-white/15 shadow-xl flex items-center gap-3 backdrop-blur-xl hover:scale-105 transition-transform"
           >
-            <span className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
-              ⚡
+            <span className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <AnimatedZap size={18} color="#34d399" />
             </span>
             <div>
               <p className="text-xs font-semibold text-textPrimary">Full-Stack</p>

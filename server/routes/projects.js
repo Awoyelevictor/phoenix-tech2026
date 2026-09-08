@@ -120,7 +120,7 @@ router.get('/', async (req, res) => {
 // CREATE new project
 router.post('/', async (req, res) => {
   try {
-    const { name, description, technologies, github, liveUrl, gradientFrom, gradientTo, icon, featured } = req.body;
+    const { name, description, technologies, github, liveUrl, gradientFrom, gradientTo, icon, image, featured } = req.body;
     if (!name || !description) {
       return res.status(400).json({ error: 'Name and description are required' });
     }
@@ -134,6 +134,7 @@ router.post('/', async (req, res) => {
       gradientFrom: gradientFrom || '#6366f1',
       gradientTo: gradientTo || '#a855f7',
       icon: icon || '💻',
+      image: image || '',
       featured: Boolean(featured)
     });
 
@@ -148,7 +149,7 @@ router.post('/', async (req, res) => {
 // UPDATE project
 router.put('/:id', async (req, res) => {
   try {
-    const { name, description, technologies, github, liveUrl, gradientFrom, gradientTo, icon, featured } = req.body;
+    const { name, description, technologies, github, liveUrl, gradientFrom, gradientTo, icon, image, featured } = req.body;
     
     const formattedTech = Array.isArray(technologies) 
       ? technologies 
@@ -163,6 +164,7 @@ router.put('/:id', async (req, res) => {
       ...(gradientFrom && { gradientFrom }),
       ...(gradientTo && { gradientTo }),
       ...(icon && { icon }),
+      ...(image !== undefined && { image }),
       ...(featured !== undefined && { featured: Boolean(featured) }),
     };
 

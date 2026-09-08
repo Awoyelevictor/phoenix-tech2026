@@ -43,19 +43,35 @@ const Contact = ({ socials = portfolioDataRaw.socials }) => {
     e.preventDefault();
     setStatus('sending');
 
+    // Create inquiry record
+    const newInquiry = {
+      _id: 'inq_' + Date.now(),
+      name: formData.name,
+      email: formData.email,
+      message: formData.message,
+      createdAt: new Date().toISOString(),
+      read: false
+    };
+
+    // 1. Immediately save to localStorage so it appears in Admin Page right away
     try {
+      const existing = JSON.parse(localStorage.getItem('portfolio_inquiries') || '[]');
+      localStorage.setItem('portfolio_inquiries', JSON.stringify([newInquiry, ...existing]));
+    } catch (err) {
+      console.debug('Failed saving inquiry locally:', err);
+    }
+
+    try {
+      // 2. Also send to MongoDB backend & trigger email notification
       await sendContactMessage(formData);
       setStatus('sent');
       setFormData({ name: '', email: '', message: '' });
       setTimeout(() => setStatus('idle'), 4000);
     } catch (error) {
-      console.warn('Backend contact endpoint not active, simulating message success fallback:', error);
-      // Friendly fallback for standalone frontend
-      setTimeout(() => {
-        setStatus('sent');
-        setFormData({ name: '', email: '', message: '' });
-        setTimeout(() => setStatus('idle'), 4000);
-      }, 1000);
+      console.warn('Backend contact endpoint not active, saved to local inquiries:', error);
+      setStatus('sent');
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setStatus('idle'), 4000);
     }
   };
 

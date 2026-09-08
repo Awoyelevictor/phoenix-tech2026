@@ -6,9 +6,11 @@ const router = express.Router();
 // Record a new page view
 router.post('/view', async (req, res) => {
   try {
+    const { countryCode = 'Unknown' } = req.body || {};
+
     let analytics = await Analytics.findOne();
     if (!analytics) {
-      analytics = new Analytics({ totalViews: 0, viewsHistory: [] });
+      analytics = new Analytics({ totalViews: 0, viewsHistory: [], countryBreakdown: {} });
     }
 
     analytics.totalViews += 1;
@@ -16,7 +18,12 @@ router.post('/view', async (req, res) => {
       timestamp: new Date(),
       userAgent: req.headers['user-agent'] || 'unknown',
       referrer: req.headers['referer'] || 'direct',
+      countryCode
     });
+
+    // Increment country counter
+    const currentCountryCount = analytics.countryBreakdown.get(countryCode) || 0;
+    analytics.countryBreakdown.set(countryCode, currentCountryCount + 1);
 
     // Keep history bounded to latest 1000 records
     if (analytics.viewsHistory.length > 1000) {
@@ -24,7 +31,11 @@ router.post('/view', async (req, res) => {
     }
 
     await analytics.save();
-    res.json({ success: true, totalViews: analytics.totalViews });
+    res.json({ 
+      success: true, 
+      totalViews: analytics.totalViews,
+      countryBreakdown: Object.fromEntries(analytics.countryBreakdown)
+    });
   } catch (error) {
     console.error('Analytics error:', error);
     res.status(500).json({ error: 'Failed to record analytics' });
@@ -36,7 +47,7 @@ router.get('/', async (req, res) => {
   try {
     let analytics = await Analytics.findOne();
     if (!analytics) {
-      analytics = await Analytics.create({ totalViews: 0, viewsHistory: [] });
+      analytics = await Analytics.create({ totalViews: 0, viewsHistory: [], countryBreakdown: {} });
     }
 
     // Calculate views today
@@ -47,6 +58,7 @@ router.get('/', async (req, res) => {
     res.json({
       totalViews: analytics.totalViews,
       viewsToday,
+      countryBreakdown: Object.fromEntries(analytics.countryBreakdown || new Map()),
       recentViews: analytics.viewsHistory.slice(-20).reverse()
     });
   } catch (error) {

@@ -1,14 +1,23 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import portfolioDataRaw from '../data/portfolio.json';
-import { AnimatedSparkles, AnimatedCode } from './icons/AnimatedIcons';
+import { 
+  AnimatedSparkles, 
+  AnimatedCode,
+  AnimatedPalette,
+  AnimatedServer,
+  AnimatedDatabase,
+  AnimatedTools,
+  AnimatedBot,
+  AnimatedZap
+} from './icons/AnimatedIcons';
 
 const CATEGORY_META = {
-  frontend: { title: 'Frontend Architecture', icon: '🎨', color: 'from-cyan-500/20 to-blue-600/20', borderColor: 'border-cyan-500/30' },
-  backend: { title: 'Backend & APIs', icon: '⚡', color: 'from-indigo-500/20 to-purple-600/20', borderColor: 'border-indigo-500/30' },
-  database: { title: 'Database & Storage', icon: '🗄️', color: 'from-emerald-500/20 to-teal-600/20', borderColor: 'border-emerald-500/30' },
-  tools: { title: 'Workflow & DevOps', icon: '🛠️', color: 'from-amber-500/20 to-orange-600/20', borderColor: 'border-amber-500/30' },
-  ai: { title: 'AI & Machine Learning', icon: '🤖', color: 'from-purple-500/20 to-pink-600/20', borderColor: 'border-purple-500/30' },
+  frontend: { title: 'Frontend Architecture', icon: <AnimatedPalette size={22} color="#06b6d4" />, color: 'from-cyan-500/20 to-blue-600/20', borderColor: 'border-cyan-500/30' },
+  backend: { title: 'Backend & APIs', icon: <AnimatedServer size={22} color="#818cf8" />, color: 'from-indigo-500/20 to-purple-600/20', borderColor: 'border-indigo-500/30' },
+  database: { title: 'Database & Storage', icon: <AnimatedDatabase size={22} color="#10b981" />, color: 'from-emerald-500/20 to-teal-600/20', borderColor: 'border-emerald-500/30' },
+  tools: { title: 'Workflow & DevOps', icon: <AnimatedTools size={22} color="#f59e0b" />, color: 'from-amber-500/20 to-orange-600/20', borderColor: 'border-amber-500/30' },
+  ai: { title: 'AI & Machine Learning', icon: <AnimatedBot size={22} color="#c084fc" />, color: 'from-purple-500/20 to-pink-600/20', borderColor: 'border-purple-500/30' },
 };
 
 const Skills = ({ 
@@ -68,10 +77,14 @@ const Skills = ({
 
       {/* Technologies Category Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-        {Object.entries(technologies).map(([category, items], catIdx) => {
+        {Object.entries(technologies || {}).map(([category, rawItems], catIdx) => {
+          const items = Array.isArray(rawItems)
+            ? rawItems
+            : (typeof rawItems === 'string' ? rawItems.split(',').map(s => s.trim()).filter(Boolean) : []);
+
           const meta = CATEGORY_META[category] || { 
             title: category, 
-            icon: '💻', 
+            icon: <AnimatedCode size={22} color="#a1a1aa" />, 
             color: 'from-white/10 to-white/5', 
             borderColor: 'border-white/10' 
           };
@@ -91,17 +104,17 @@ const Skills = ({
               className="bg-charcoal/70 rounded-3xl p-7 border border-white/[0.06] hover:border-white/20 transition-all duration-300 backdrop-blur-sm flex flex-col justify-between group"
             >
               <div>
-                {/* Category Header */}
+                {/* Header */}
                 <div className="flex items-center gap-3.5 mb-6">
-                  <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${meta.color} border ${meta.borderColor} flex items-center justify-center text-xl shadow-lg`}>
+                  <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/[0.08] group-hover:border-accent/40 group-hover:bg-accent/10 transition-all duration-300">
                     {meta.icon}
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-textPrimary group-hover:text-accent transition-colors">
+                    <h3 className="font-bold text-textPrimary text-base group-hover:text-accent transition-colors">
                       {meta.title}
                     </h3>
-                    <p className="text-[11px] text-textMuted uppercase tracking-wider font-semibold">
-                      {items.length} Technologies
+                    <p className="text-[11px] text-textMuted font-medium">
+                      {items.length} technologies
                     </p>
                   </div>
                 </div>
@@ -135,13 +148,18 @@ const Skills = ({
           className="bg-charcoal/50 rounded-3xl p-8 border border-white/[0.06] backdrop-blur-sm"
         >
           <div className="flex items-center gap-2.5 mb-6">
-            <span className="text-accent text-lg">⚡</span>
+            <span className="text-accent flex items-center justify-center">
+              <AnimatedZap size={20} color="#818cf8" />
+            </span>
             <h3 className="text-lg font-bold text-textPrimary tracking-tight">
               Core Specializations
             </h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {specialization?.map((spec, idx) => (
+            {(Array.isArray(specialization)
+              ? specialization
+              : (typeof specialization === 'string' ? specialization.split(',').map(s => s.trim()).filter(Boolean) : [])
+            ).map((spec, idx) => (
               <div 
                 key={idx}
                 className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:border-accent/30 hover:bg-white/[0.06] transition-all flex items-center gap-3"

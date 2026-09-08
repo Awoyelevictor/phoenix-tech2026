@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5001/api';
 
 // --- Contact & Messages ---
 export const sendContactMessage = async (formData) => {
@@ -32,10 +32,12 @@ export const deleteMessage = async (id) => {
 };
 
 // --- Analytics ---
-export const recordPageView = async () => {
+export const recordPageView = async (countryCode = 'Unknown') => {
   try {
     const response = await fetch(`${API_BASE_URL}/analytics/view`, {
-      method: 'POST'
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ countryCode })
     });
     return await response.json();
   } catch (error) {

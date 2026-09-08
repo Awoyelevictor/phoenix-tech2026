@@ -30,11 +30,7 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    // 1. Save message to MongoDB
-    const newMessage = new Message({ name, email, message });
-    await newMessage.save();
-
-    // 2. Send email notification via Gmail
+    // 1. Send email notification via Gmail FIRST to ensure it's delivered
     const recipient = process.env.GMAIL_USER || 'awoyeleemma1@gmail.com';
     const transporter = createTransporter();
 
@@ -63,13 +59,19 @@ router.post('/', async (req, res) => {
       `
     };
 
-    transporter.sendMail(mailOptions).catch(err => {
-      console.error('Nodemailer background delivery note:', err.message);
-    });
+    await transporter.sendMail(mailOptions);
+
+    // 2. Try to save message to MongoDB (but don't fail if DB is down)
+    try {
+      const newMessage = new Message({ name, email, message });
+      await newMessage.save();
+    } catch (dbError) {
+      console.warn('Could not save to MongoDB, but email was sent:', dbError.message);
+    }
 
     res.status(200).json({ success: true, message: 'Message sent successfully!' });
   } catch (error) {
-    console.error('Contact Form Error:', error);
+    console.error('Contact Form Email Error:', error);
     res.status(500).json({ success: false, error: 'Failed to process message.' });
   }
 });

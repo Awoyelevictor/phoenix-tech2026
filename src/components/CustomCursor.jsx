@@ -21,7 +21,7 @@ const CustomCursor = () => {
     };
 
     const handleMouseOver = (e) => {
-      if (e.target.closest('a, button, [role="button"], input, textarea, select, .cursor-pointer')) {
+      if (e.target.closest('a, button, [role="button"], input, textarea, select, label, .cursor-pointer, [type="checkbox"], [type="color"]')) {
         setIsHovering(true);
       } else {
         setIsHovering(false);
@@ -55,7 +55,7 @@ const CustomCursor = () => {
     <>
       {/* Outer ring */}
       <motion.div
-        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999]"
+        className="fixed top-0 left-0 rounded-full pointer-events-none z-[99999]"
         animate={{
           x: mousePosition.x - (isHovering ? 24 : 16),
           y: mousePosition.y - (isHovering ? 24 : 16),
@@ -72,7 +72,7 @@ const CustomCursor = () => {
       />
       {/* Inner dot */}
       <motion.div
-        className="fixed top-0 left-0 w-1.5 h-1.5 rounded-full pointer-events-none z-[9999]"
+        className="fixed top-0 left-0 w-1.5 h-1.5 rounded-full pointer-events-none z-[99999]"
         animate={{
           x: mousePosition.x - 3,
           y: mousePosition.y - 3,
