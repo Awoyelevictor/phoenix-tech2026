@@ -1,129 +1,247 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
-import profile from '../../public/profile.png';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 
 const Hero = () => {
-  const { scrollYProgress } = useScroll();
-  const yBg = useTransform(scrollYProgress, [0, 1], ["-20%", "20%"]);
-  const yImg = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
-  const opacityText = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const containerRef = useRef(null);
+
+  // Parallax scroll binding for hero section
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 20 });
+
+  // Multi-depth parallax layers
+  const yText = useTransform(smoothProgress, [0, 1], [0, 80]);
+  const yImage = useTransform(smoothProgress, [0, 1], [0, 50]);
+  const yChip1 = useTransform(smoothProgress, [0, 1], [0, -70]);
+  const yChip2 = useTransform(smoothProgress, [0, 1], [0, -110]);
+  const yChip3 = useTransform(smoothProgress, [0, 1], [0, -40]);
+  const yOrb1 = useTransform(smoothProgress, [0, 1], [0, -120]);
+  const yOrb2 = useTransform(smoothProgress, [0, 1], [0, 100]);
+  const opacityHero = useTransform(smoothProgress, [0, 0.85], [1, 0]);
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-64">
-      {/* Particle Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        {[...Array(30)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute bg-white/20 rounded-full"
-            style={{
-              width: Math.random() * 4 + 2 + 'px',
-              height: Math.random() * 4 + 2 + 'px',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-            }}
-            animate={{
-              y: [0, Math.random() * -100 - 50],
-              x: [0, Math.random() * 50 - 25],
-              opacity: [0, 0.5, 0],
-            }}
-            transition={{
-              duration: Math.random() * 10 + 10,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
-      </div>
+    <section 
+      id="home" 
+      ref={containerRef}
+      className="relative min-h-[95vh] flex items-center justify-center overflow-hidden pt-28 md:pt-36 pb-16 px-6"
+    >
+      {/* Background Parallax Orbs & Glow */}
+      <motion.div 
+        style={{ y: yOrb1 }}
+        className="absolute -top-24 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[130px] pointer-events-none -z-10" 
+      />
+      <motion.div 
+        style={{ y: yOrb2 }}
+        className="absolute top-1/3 -right-20 w-[30rem] h-[30rem] bg-purple-600/15 rounded-full blur-[150px] pointer-events-none -z-10" 
+      />
+      <div className="absolute -bottom-10 left-1/3 w-80 h-80 bg-amber/10 rounded-full blur-[120px] pointer-events-none -z-10" />
 
-      {/* Main Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12">
+      {/* Grid Pattern Background */}
+      <div 
+        className="absolute inset-0 pointer-events-none -z-20 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)`,
+          backgroundSize: '48px 48px'
+        }}
+      />
 
-        {/* Left Side: Text */}
-        <motion.div
-          className="flex-1 text-center md:text-left"
-          style={{ y: yBg }}
+      {/* Hero Content Container */}
+      <motion.div 
+        style={{ opacity: opacityHero }}
+        className="relative z-10 w-full max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-12 lg:gap-16"
+      >
+        {/* Left: Text & Action */}
+        <motion.div 
+          style={{ y: yText }}
+          className="flex-1 text-center lg:text-left"
         >
+          {/* Status Badge */}
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md mb-6"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span className="text-xs font-medium tracking-wide text-textSecondary">
+              Available for full-time & freelance projects
+            </span>
+          </motion.div>
+
+          {/* Heading */}
           <motion.h1
-            className="text-4xl md:text-6xl lg:text-8xl font-black text-textPrimary tracking-tighter leading-[1.1] mb-4 md:mb-6"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            Hi, I'm <br />
-            <span className="text-accent">Victor Awoyele</span> <br />
-            Web Developer
-          </motion.h1>
-
-          <motion.p
-            className="text-base md:text-xl text-textSecondary font-light max-w-xl mx-auto md:mx-0 mb-6 md:mb-10 leading-relaxed"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            I create beautiful, functional websites and applications with a focus on user experience and modern design principles.
-          </motion.p>
-
-          {/* Restored Buttons inside text container */}
-          <motion.div
-            className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-textPrimary mb-6"
           >
-            <a href="#projects" className="px-6 py-3 md:px-8 md:py-4 bg-accent text-white rounded-xl font-medium tracking-wide hover:bg-accent/90 transition-colors">
-              View My Work
+            Crafting Scalable <br className="hidden sm:inline" />
+            <span className="text-gradient-accent">Web Experiences</span> <br />
+            & AI Solutions
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-base sm:text-lg text-textSecondary font-normal max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed"
+          >
+            Hi, I'm <strong className="text-textPrimary font-semibold">Victor Awoyele</strong> — a Computer Science student and Full-Stack Web Developer specialized in React, modern JavaScript ecosystems, and intelligent AI integrations.
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.45 }}
+            className="flex flex-wrap items-center justify-center lg:justify-start gap-4"
+          >
+            <a
+              href="#projects"
+              className="px-7 py-3.5 bg-gradient-to-r from-accent to-purple-600 text-white rounded-xl text-sm font-semibold tracking-wide hover:shadow-lg hover:shadow-accent/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+            >
+              Explore Projects
             </a>
-            <a href="#contact" className="px-6 py-3 md:px-8 md:py-4 border border-white/20 text-textPrimary rounded-xl font-medium tracking-wide hover:bg-white/5 transition-colors">
-              Contact Me
+            <a
+              href="#contact"
+              className="px-7 py-3.5 bg-white/[0.03] hover:bg-white/[0.08] text-textPrimary border border-white/10 rounded-xl text-sm font-semibold tracking-wide hover:border-white/20 transition-all duration-300"
+            >
+              Get In Touch
             </a>
+          </motion.div>
+
+          {/* Quick Metrics / Social Proof */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="mt-12 pt-8 border-t border-white/[0.06] flex items-center justify-center lg:justify-start gap-8 sm:gap-12"
+          >
+            <div>
+              <div className="text-2xl sm:text-3xl font-bold text-textPrimary">10+</div>
+              <div className="text-xs text-textMuted uppercase tracking-wider mt-0.5">Projects Built</div>
+            </div>
+            <div className="w-[1px] h-8 bg-white/10" />
+            <div>
+              <div className="text-2xl sm:text-3xl font-bold text-textPrimary">Full-Stack</div>
+              <div className="text-xs text-textMuted uppercase tracking-wider mt-0.5">Specialization</div>
+            </div>
+            <div className="w-[1px] h-8 bg-white/10" />
+            <div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent">100%</div>
+              <div className="text-xs text-textMuted uppercase tracking-wider mt-0.5">Dedication</div>
+            </div>
           </motion.div>
         </motion.div>
 
-        {/* Right Side: Profile Picture - Always visible, responsive layout, transparent border */}
-        <motion.div
-          className="flex-1 flex items-center justify-center relative mt-8 md:mt-0"
-          style={{ y: yImg }}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
+        {/* Right: Interactive Parallax Image & Floating Chips */}
+        <motion.div 
+          style={{ y: yImage }}
+          className="flex-1 relative flex items-center justify-center w-full max-w-md lg:max-w-lg"
         >
-          {/* Animated glow behind the image */}
-          <motion.div
-            className="absolute w-48 h-48 md:w-72 md:h-72 lg:w-96 lg:h-96 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-400 blur-2xl opacity-40"
-            animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 90, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
+          {/* Pulsing Backlight */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-accent/30 to-purple-600/30 rounded-full blur-3xl scale-95 animate-pulse" />
 
-          {/* Profile Image with Transparent Border */}
-          <div className="relative z-10 w-40 h-40 md:w-64 md:h-64 lg:w-80 lg:h-80 rounded-full overflow-hidden border-4 border-transparent shadow-2xl">
-            <img
-              src={profile}
-              alt="Victor Awoyele"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback if image isn't saved yet
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'flex';
-              }}
-            />
-            {/* Fallback placeholder if image fails to load */}
-            <div className="hidden absolute inset-0 bg-charcoal items-center justify-center text-textMuted text-sm text-center px-4">
-              Save image to public/profile.png
+          {/* Avatar Container with Glass Border */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative z-10 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-3xl p-2 bg-gradient-to-b from-white/15 to-white/5 backdrop-blur-xl border border-white/20 shadow-2xl overflow-hidden group"
+          >
+            <div className="w-full h-full rounded-2xl overflow-hidden bg-charcoal relative">
+              <img
+                src="/profile.png"
+                alt="Victor Awoyele"
+                className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/vite.svg";
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-darkBg/80 via-transparent to-transparent opacity-60" />
             </div>
-          </div>
+          </motion.div>
+
+          {/* Floating Parallax Chip 1: React & Next/Vite */}
+          <motion.div
+            style={{ y: yChip1 }}
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="absolute -left-4 top-12 sm:top-16 z-20 px-4 py-2.5 rounded-2xl glass-card border border-white/15 shadow-xl flex items-center gap-3 backdrop-blur-xl hover:scale-105 transition-transform"
+          >
+            <span className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">
+              ⚛️
+            </span>
+            <div>
+              <p className="text-xs font-semibold text-textPrimary">Frontend Core</p>
+              <p className="text-[11px] text-textMuted">React & Tailwind CSS</p>
+            </div>
+          </motion.div>
+
+          {/* Floating Parallax Chip 2: AI & LLM integration */}
+          <motion.div
+            style={{ y: yChip2 }}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.55 }}
+            className="absolute -right-4 top-1/2 z-20 px-4 py-2.5 rounded-2xl glass-card border border-white/15 shadow-xl flex items-center gap-3 backdrop-blur-xl hover:scale-105 transition-transform"
+          >
+            <span className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm">
+              🤖
+            </span>
+            <div>
+              <p className="text-xs font-semibold text-textPrimary">AI Powered</p>
+              <p className="text-[11px] text-textMuted">Gemini & LLMs</p>
+            </div>
+          </motion.div>
+
+          {/* Floating Parallax Chip 3: Backend & Databases */}
+          <motion.div
+            style={{ y: yChip3 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="absolute left-6 -bottom-6 z-20 px-4 py-2.5 rounded-2xl glass-card border border-white/15 shadow-xl flex items-center gap-3 backdrop-blur-xl hover:scale-105 transition-transform"
+          >
+            <span className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+              ⚡
+            </span>
+            <div>
+              <p className="text-xs font-semibold text-textPrimary">Full-Stack</p>
+              <p className="text-[11px] text-textMuted">Node.js & MongoDB</p>
+            </div>
+          </motion.div>
         </motion.div>
+      </motion.div>
 
-
-      </div>
+      {/* Scroll Down Indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1, duration: 1 }}
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
+      >
+        <span className="text-[11px] tracking-widest uppercase text-textMuted font-medium">Scroll</span>
+        <motion.div 
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          className="w-4 h-7 rounded-full border border-white/20 flex items-start justify-center p-1"
+        >
+          <div className="w-1 h-1.5 bg-accent rounded-full" />
+        </motion.div>
+      </motion.div>
     </section>
   );
 };
 
 export default Hero;
+

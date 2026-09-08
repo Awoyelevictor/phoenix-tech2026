@@ -1,105 +1,195 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import portfolioDataRaw from '../data/portfolio.json';
+import { AnimatedSparkles, AnimatedCode } from './icons/AnimatedIcons';
 
-const Skills = ({ technologies, specialization }) => {
+const CATEGORY_META = {
+  frontend: { title: 'Frontend Architecture', icon: '🎨', color: 'from-cyan-500/20 to-blue-600/20', borderColor: 'border-cyan-500/30' },
+  backend: { title: 'Backend & APIs', icon: '⚡', color: 'from-indigo-500/20 to-purple-600/20', borderColor: 'border-indigo-500/30' },
+  database: { title: 'Database & Storage', icon: '🗄️', color: 'from-emerald-500/20 to-teal-600/20', borderColor: 'border-emerald-500/30' },
+  tools: { title: 'Workflow & DevOps', icon: '🛠️', color: 'from-amber-500/20 to-orange-600/20', borderColor: 'border-amber-500/30' },
+  ai: { title: 'AI & Machine Learning', icon: '🤖', color: 'from-purple-500/20 to-pink-600/20', borderColor: 'border-purple-500/30' },
+};
+
+const Skills = ({ 
+  technologies = portfolioDataRaw.technologies, 
+  specialization = portfolioDataRaw.specialization,
+  experience = portfolioDataRaw.experience,
+  careerGoals = portfolioDataRaw.careerGoals 
+}) => {
+  const sectionRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  const yOrb = useTransform(scrollYProgress, [0, 1], [-60, 60]);
+
   if (!technologies) return null;
 
   return (
-    <section className="py-32 px-6 relative z-10 max-w-7xl mx-auto">
-      {/* Section divider */}
-      <div className="section-divider mb-32" />
+    <section 
+      id="skills" 
+      ref={sectionRef}
+      className="py-32 px-6 relative z-10 max-w-7xl mx-auto overflow-hidden"
+    >
+      {/* Parallax Ambient Orbs */}
+      <motion.div 
+        style={{ y: yOrb }}
+        className="absolute top-1/3 -left-32 w-96 h-96 bg-accent/15 rounded-full blur-[140px] pointer-events-none -z-10"
+      />
+      <div className="absolute bottom-10 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-[130px] pointer-events-none -z-10" />
 
+      {/* Section divider */}
+      <div className="section-divider mb-28" />
+
+      {/* Header */}
       <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="mb-20 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6"
       >
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-20 text-right"
-        >
-          <span className="text-xs font-medium tracking-[0.2em] uppercase text-textMuted mb-3 block">
-            Capabilities
-          </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-textPrimary tracking-tight">
-            Skills & Expertise
+        <div>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold uppercase tracking-wider mb-4">
+            <AnimatedCode size={14} />
+            <span>Technical Capabilities</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-textPrimary tracking-tight">
+            Skills & <span className="text-gradient-accent">Expertise</span>
           </h2>
+        </div>
+        <p className="text-textSecondary text-sm sm:text-base max-w-md font-normal leading-relaxed">
+          Comprehensive stack spanning modern frontend user interfaces, high-performance backends, database design, and next-gen AI systems.
+        </p>
+      </motion.div>
+
+      {/* Technologies Category Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+        {Object.entries(technologies).map(([category, items], catIdx) => {
+          const meta = CATEGORY_META[category] || { 
+            title: category, 
+            icon: '💻', 
+            color: 'from-white/10 to-white/5', 
+            borderColor: 'border-white/10' 
+          };
+
+          return (
+            <motion.div 
+              key={category}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ 
+                delay: catIdx * 0.1, 
+                duration: 0.6,
+                ease: [0.22, 1, 0.36, 1]
+              }}
+              whileHover={{ y: -6 }}
+              className="bg-charcoal/70 rounded-3xl p-7 border border-white/[0.06] hover:border-white/20 transition-all duration-300 backdrop-blur-sm flex flex-col justify-between group"
+            >
+              <div>
+                {/* Category Header */}
+                <div className="flex items-center gap-3.5 mb-6">
+                  <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${meta.color} border ${meta.borderColor} flex items-center justify-center text-xl shadow-lg`}>
+                    {meta.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-textPrimary group-hover:text-accent transition-colors">
+                      {meta.title}
+                    </h3>
+                    <p className="text-[11px] text-textMuted uppercase tracking-wider font-semibold">
+                      {items.length} Technologies
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tech Pills */}
+                <div className="flex flex-wrap gap-2">
+                  {items.map((tech, idx) => (
+                    <motion.span 
+                      key={idx}
+                      whileHover={{ scale: 1.05 }}
+                      className="px-3.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-accent/20 border border-white/[0.06] hover:border-accent/40 text-xs font-medium text-textSecondary hover:text-white transition-all duration-300"
+                    >
+                      {tech}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Specialization & Experience Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Specializations Card */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.7 }}
+          className="bg-charcoal/50 rounded-3xl p-8 border border-white/[0.06] backdrop-blur-sm"
+        >
+          <div className="flex items-center gap-2.5 mb-6">
+            <span className="text-accent text-lg">⚡</span>
+            <h3 className="text-lg font-bold text-textPrimary tracking-tight">
+              Core Specializations
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {specialization?.map((spec, idx) => (
+              <div 
+                key={idx}
+                className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:border-accent/30 hover:bg-white/[0.06] transition-all flex items-center gap-3"
+              >
+                <div className="w-2 h-2 rounded-full bg-accent" />
+                <span className="text-xs sm:text-sm font-semibold text-textPrimary">
+                  {spec}
+                </span>
+              </div>
+            ))}
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-          
-          {/* Specializations */}
+        {/* Experience & Goals Card */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.7 }}
+          className="bg-charcoal/50 rounded-3xl p-8 border border-white/[0.06] backdrop-blur-sm flex flex-col justify-between"
+        >
           <div>
-            <h3 className="text-xs font-medium text-textMuted uppercase tracking-[0.15em] mb-8">
-              Specialization
-            </h3>
-            <div className="flex flex-col gap-3">
-              {specialization?.map((spec, idx) => (
-                <motion.div 
+            <div className="flex items-center gap-2.5 mb-6">
+              <span className="text-purple-400 text-lg">🎯</span>
+              <h3 className="text-lg font-bold text-textPrimary tracking-tight">
+                Practical Focus & Intern Experience
+              </h3>
+            </div>
+            <p className="text-xs sm:text-sm text-textSecondary leading-relaxed mb-6 font-normal">
+              {experience?.role ? `${experience.role}: ` : ''}
+              Passionate about building full-stack products, responsive UI components, and integrating cutting-edge AI features.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(experience?.focus || careerGoals || []).slice(0, 5).map((item, idx) => (
+                <span 
                   key={idx}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ 
-                    delay: idx * 0.08, 
-                    duration: 0.6,
-                    ease: [0.22, 1, 0.36, 1]
-                  }}
-                  className="group p-4 rounded-xl glass-card-hover"
+                  className="px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-1 h-1 rounded-full bg-accent/40 group-hover:bg-accent transition-colors duration-500" />
-                    <span className="text-sm text-textSecondary font-medium group-hover:text-textPrimary transition-colors duration-500">
-                      {spec}
-                    </span>
-                  </div>
-                </motion.div>
+                  ✓ {item}
+                </span>
               ))}
             </div>
           </div>
-
-          {/* Technologies Grid */}
-          <div>
-            <h3 className="text-xs font-medium text-textMuted uppercase tracking-[0.15em] mb-8">
-              Tech Stack
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
-              {Object.entries(technologies).map(([category, items], catIdx) => (
-                <motion.div 
-                  key={category}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ 
-                    delay: catIdx * 0.1, 
-                    duration: 0.6,
-                    ease: [0.22, 1, 0.36, 1]
-                  }}
-                  className="mb-2"
-                >
-                  <h4 className="text-[11px] text-amber/60 mb-4 capitalize font-semibold tracking-wider uppercase">
-                    {category}
-                  </h4>
-                  <ul className="space-y-2.5">
-                    {items.map((tech, idx) => (
-                      <li key={idx} className="text-sm text-textMuted hover:text-textSecondary transition-colors duration-300">
-                        {tech}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 };
 
 export default Skills;
+

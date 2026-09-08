@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
-import Skills from './components/Skills'; // Import Skills
+import Skills from './components/Skills';
 import Contact from './components/Contact';
 import CustomCursor from './components/CustomCursor';
 import Loader from './components/Loader';
@@ -15,19 +15,19 @@ import portfolioDataRaw from './data/portfolio.json';
 
 function PortfolioApp() {
   const [loading, setLoading] = useState(true);
-  const [portfolio, setPortfolio] = useState(null); // State to hold portfolio data
+  const [portfolio, setPortfolio] = useState(portfolioDataRaw);
 
-  // Load portfolio data once when the component mounts
   useEffect(() => {
-    // Since portfolioDataRaw is imported directly, it's already available.
-    // We can set it to state immediately.
     setPortfolio(portfolioDataRaw);
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
-  // Create a 3D perspective scroll effect for the main container
+  // Smooth scroll progress bar across the entire page
   const { scrollYProgress } = useScroll();
-  const rotateX = useTransform(scrollYProgress, [0, 1], [0, -5]);
-  const translateZ = useTransform(scrollYProgress, [0, 1], [0, -50]);
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   return (
     <>
@@ -37,25 +37,35 @@ function PortfolioApp() {
         {loading && <Loader onComplete={() => setLoading(false)} />}
       </AnimatePresence>
 
-      {!loading && portfolio && ( // Render only when not loading and portfolio data is available
-        <div className="perspective-container overflow-x-hidden">
+      {!loading && portfolio && (
+        <div className="relative min-h-screen bg-darkBg text-textPrimary selection:bg-accent/30 selection:text-white">
+          {/* Top Parallax Scroll Progress Bar */}
           <motion.div 
-            className="preserve-3d min-h-screen"
-            style={{ 
-              rotateX,
-              translateZ,
-              transformOrigin: "top center"
-            }}
-          >
-            <Navbar />
-            <main className="relative z-10">
-              <Hero />
-              <Projects />
-              {/* Pass the loaded data as props to the Skills component */}
-              <Skills technologies={portfolio.technologies} specialization={portfolio.specialization} />
-              <Contact />
-            </main>
-          </motion.div>
+            className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-accent via-purple-500 to-cyan-400 origin-left z-[100] shadow-[0_0_12px_rgba(99,102,241,0.6)]"
+            style={{ scaleX }}
+          />
+
+          <Navbar />
+          
+          <main className="relative z-10">
+            <Hero />
+            
+            <Projects 
+              projects={portfolio.projects} 
+              featuredProjects={portfolio.featuredProjects} 
+            />
+            
+            <Skills 
+              technologies={portfolio.technologies} 
+              specialization={portfolio.specialization}
+              experience={portfolio.experience}
+              careerGoals={portfolio.careerGoals}
+            />
+            
+            <Contact 
+              socials={portfolio.socials} 
+            />
+          </main>
         </div>
       )}
     </>
@@ -74,3 +84,4 @@ function App() {
 }
 
 export default App;
+
