@@ -49,7 +49,8 @@ app.get('*', (req, res) => {
 });
 
 // Database Connection
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/portfolio';
+// Use the proper env‑var name (MONGODB_URI); fallback to MONGO_URI for backward compatibility
+const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/portfolio';
 
 mongoose.connect(mongoUri)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
