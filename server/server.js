@@ -44,7 +44,7 @@ app.get('/api/ping', (req, res) => {
 
 // For any non-API route, send back the React index.html
 // This makes React Router work correctly on refresh/direct URL
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
