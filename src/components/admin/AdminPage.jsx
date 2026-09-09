@@ -276,14 +276,14 @@ const AdminPage = () => {
   const handleDeleteProject = async (id) => {
     if (!window.confirm('Are you sure you want to delete this project?')) return;
     try {
-      const updatedList = projects.filter(p => (p._id || p.id) !== id);
+      const updatedList = projects.filter(p => (p._id || p.id || p.name) !== id);
       setProjects(updatedList);
       localStorage.setItem('portfolio_live_projects', JSON.stringify(updatedList));
 
       await deleteProject(id);
       showToast('Project deleted');
     } catch (error) {
-      const updatedList = projects.filter(p => (p._id || p.id) !== id);
+      const updatedList = projects.filter(p => (p._id || p.id || p.name) !== id);
       setProjects(updatedList);
       localStorage.setItem('portfolio_live_projects', JSON.stringify(updatedList));
       showToast('Project removed');
@@ -950,7 +950,7 @@ const AdminPage = () => {
                       <span>Edit</span>
                     </button>
                     <button
-                      onClick={() => handleDeleteProject(project._id || project.id)}
+                      onClick={() => handleDeleteProject(project._id || project.id || project.name)}
                       className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                     >
                       <AnimatedTrash size={13} color="#f87171" />
