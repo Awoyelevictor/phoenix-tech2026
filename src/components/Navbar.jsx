@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 
 const navLinks = [
   { name: "Home", href: "#home" },
+  { name: "About", href: "#about" },
   { name: "Projects", href: "#projects" },
   { name: "Skills", href: "#skills" },
   { name: "Contact", href: "#contact" },
@@ -18,7 +19,7 @@ function Navbar() {
       setScrolled(window.scrollY > 30);
 
       // Scroll spy for active section
-      const sections = ["home", "projects", "skills", "contact"];
+      const sections = ["home", "about", "projects", "skills", "contact"];
       const scrollPosition = window.scrollY + 200;
 
       for (let i = sections.length - 1; i >= 0; i--) {

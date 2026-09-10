@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import About from './components/About';
 import Projects from './components/Projects';
 import Skills from './components/Skills';
 import Contact from './components/Contact';
@@ -135,6 +136,12 @@ function PortfolioApp() {
         <main className="relative z-10">
           <Hero />
           
+          <About 
+            aboutData={portfolio?.about}
+            phone={portfolio?.phone}
+            whatsapp={portfolio?.whatsapp}
+          />
+
           <Projects 
             projects={portfolio?.projects} 
             featuredProjects={portfolio?.featuredProjects} 

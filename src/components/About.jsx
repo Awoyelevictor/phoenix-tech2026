@@ -1,0 +1,317 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Sparkles, 
+  Terminal, 
+  Code2, 
+  Cpu, 
+  ShieldCheck, 
+  Headphones, 
+  Gamepad2, 
+  ExternalLink, 
+  Phone, 
+  MessageCircle, 
+  Copy, 
+  Check, 
+  Flame,
+  ArrowRight
+} from 'lucide-react';
+
+const About = ({ aboutData, phone, whatsapp }) => {
+  const [copiedPhone, setCopiedPhone] = useState(false);
+
+  const phoneNumber = phone || "+2347017304536";
+  const whatsappUrl = whatsapp || "https://wa.me/2347017304536?text=Hi%20Victor,%20I%20saw%20your%20portfolio!";
+  const spotifyUrl = aboutData?.faveMusic?.url || "https://open.spotify.com/playlist/2yiM4AjKi0kROd1S4QOuAI";
+
+  const handleCopyPhone = () => {
+    navigator.clipboard.writeText(phoneNumber);
+    setCopiedPhone(true);
+    setTimeout(() => setCopiedPhone(false), 3000);
+  };
+
+  const focusPills = [
+    { label: "Frontend & UI Engineering", icon: Code2, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
+    { label: "Full-Stack Web Systems", icon: Terminal, color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
+    { label: "AI & NLP Solutions", icon: Cpu, color: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
+    { label: "Cybersecurity & Logic", icon: ShieldCheck, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+  ];
+
+  return (
+    <section id="about" className="py-28 px-6 relative z-10 max-w-7xl mx-auto overflow-hidden">
+      {/* Subtle Background Glows */}
+      <div className="absolute top-1/3 -left-32 w-96 h-96 bg-accent/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+      <div className="absolute bottom-10 right-0 w-80 h-80 bg-purple-600/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+
+      {/* Section Header */}
+      <div className="flex flex-col items-center text-center mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold uppercase tracking-wider mb-4"
+        >
+          <Sparkles size={14} />
+          <span>About Me</span>
+        </motion.div>
+
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-textPrimary tracking-tight max-w-3xl"
+        >
+          Passionate Developer. <br className="hidden sm:inline" />
+          <span className="text-gradient-accent">Purposeful Engineering.</span>
+        </motion.h2>
+        
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-textSecondary text-sm sm:text-base max-w-2xl mt-4 font-normal"
+        >
+          A deeper look into who I am, how I build digital experiences, and the things that inspire my work.
+        </motion.p>
+      </div>
+
+      {/* Main Content Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Left Column: Narrative & Focus (7 Cols) */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7 }}
+          className="lg:col-span-7 space-y-6"
+        >
+          {/* Main Bio Card */}
+          <div className="p-8 sm:p-10 rounded-3xl bg-charcoal/60 border border-white/[0.08] backdrop-blur-xl relative overflow-hidden shadow-xl">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-xs font-semibold text-textSecondary uppercase tracking-wider">
+                Software Developer • Nigeria
+              </span>
+            </div>
+
+            <div className="space-y-4 text-textSecondary text-sm sm:text-base leading-relaxed font-normal">
+              <p className="text-textPrimary font-medium text-base sm:text-lg">
+                I’m <strong className="text-white font-bold">Awoyele Victor Ayomide</strong>, a Computer Science student and software developer passionate about building practical, modern digital solutions.
+              </p>
+
+              <p>
+                My main focus is <span className="text-textPrimary font-semibold">frontend development</span>, where I work with technologies like React.js, JavaScript, Tailwind CSS, and modern web APIs to create responsive and user-friendly experiences. I also enjoy working with Node.js, Laravel, MongoDB, MySQL, and REST APIs to understand and build complete systems beyond the interface.
+              </p>
+
+              <p>
+                I’m particularly interested in <span className="text-accent font-semibold">Artificial Intelligence</span>, <span className="text-purple-400 font-semibold">Natural Language Processing</span>, and <span className="text-cyan-400 font-semibold">Cybersecurity</span>. I enjoy exploring how AI can solve real-world problems and how secure, intelligent systems can make technology more accessible and useful.
+              </p>
+
+              <p className="border-l-2 border-accent/40 pl-4 italic text-textMuted text-xs sm:text-sm my-2">
+                "I believe good software should not only look good — it should solve a real problem, work reliably, and be built with purpose. I’m constantly learning, experimenting with new technologies, and turning ideas into working projects."
+              </p>
+            </div>
+
+            {/* Core Competencies Badges */}
+            <div className="mt-8 pt-6 border-t border-white/[0.06]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-textMuted mb-3">Key Focus Areas</p>
+              <div className="flex flex-wrap gap-2.5">
+                {focusPills.map((pill, i) => {
+                  const Icon = pill.icon;
+                  return (
+                    <div
+                      key={i}
+                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-xs font-medium ${pill.color} transition-all duration-200 hover:scale-[1.02]`}
+                    >
+                      <Icon size={14} />
+                      <span>{pill.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Currently Status Card */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-accent/10 via-purple-500/5 to-transparent border border-accent/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-accent/20 text-accent flex items-center justify-center shrink-0 mt-0.5">
+                <Terminal size={18} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent">Current Status</p>
+                  <span className="inline-block w-2 h-2 rounded-full bg-accent animate-ping" />
+                </div>
+                <p className="text-sm font-medium text-textPrimary mt-0.5 leading-snug">
+                  Building, learning, experimenting, and preparing for the next level of my journey in software engineering, AI, and cybersecurity.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Direct Actions: WhatsApp & Call */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 rounded-2xl bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#25D366] flex items-center justify-between group transition-all duration-300 hover:shadow-lg hover:shadow-[#25D366]/10"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#25D366]/20 flex items-center justify-center text-[#25D366] group-hover:scale-110 transition-transform">
+                  <MessageCircle size={20} />
+                </div>
+                <div>
+                  <p className="text-xs uppercase font-semibold text-textMuted tracking-wider">Chat Directly</p>
+                  <p className="text-sm font-bold text-textPrimary group-hover:text-[#25D366] transition-colors">WhatsApp Chat</p>
+                </div>
+              </div>
+              <ArrowRight size={16} className="text-[#25D366] group-hover:translate-x-1 transition-transform" />
+            </a>
+
+            <div className="p-4 rounded-2xl bg-charcoal/60 border border-white/[0.08] flex items-center justify-between">
+              <a 
+                href={`tel:${phoneNumber}`}
+                className="flex items-center gap-3 min-w-0 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform shrink-0">
+                  <Phone size={18} />
+                </div>
+                <div className="truncate">
+                  <p className="text-xs uppercase font-semibold text-textMuted tracking-wider">Call Me</p>
+                  <p className="text-sm font-bold text-textPrimary group-hover:text-accent transition-colors truncate">
+                    {phoneNumber}
+                  </p>
+                </div>
+              </a>
+              <button
+                onClick={handleCopyPhone}
+                className="p-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-textSecondary hover:text-white transition-colors shrink-0 ml-2"
+                title="Copy phone number"
+              >
+                {copiedPhone ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Right Column: Interactive Bento Cards (Fave Music & Game) (5 Cols) */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, delay: 0.15 }}
+          className="lg:col-span-5 space-y-6"
+        >
+          {/* Card 1: 🎧 My Fave (Spotify Playlist) */}
+          <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#121212] to-charcoal border border-[#1DB954]/25 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#1DB954]/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-[#1DB954]/20 text-[#1DB954] flex items-center justify-center">
+                  <Headphones size={20} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#1DB954]">🎧 My Fave</span>
+                  </div>
+                  <h3 className="text-base font-bold text-textPrimary leading-tight">Vibes & Coding Soundtrack</h3>
+                </div>
+              </div>
+
+              {/* Animated Audio Equalizer Bars */}
+              <div className="flex items-end gap-1 h-5 px-2">
+                <span className="w-1 bg-[#1DB954] rounded-full animate-[bounce_1s_infinite_100ms] h-3" />
+                <span className="w-1 bg-[#1DB954] rounded-full animate-[bounce_1s_infinite_300ms] h-5" />
+                <span className="w-1 bg-[#1DB954] rounded-full animate-[bounce_1s_infinite_200ms] h-4" />
+                <span className="w-1 bg-[#1DB954] rounded-full animate-[bounce_1s_infinite_400ms] h-2" />
+              </div>
+            </div>
+
+            <p className="text-xs sm:text-sm text-textSecondary leading-relaxed mb-5">
+              A little window into my taste — the songs I keep coming back to while coding, building, thinking, or just vibing.
+            </p>
+
+            {/* Embedded Spotify Compact Player */}
+            <div className="rounded-2xl overflow-hidden border border-white/10 shadow-inner bg-black/40 mb-4">
+              <iframe 
+                style={{ borderRadius: '12px' }} 
+                src="https://open.spotify.com/embed/playlist/2yiM4AjKi0kROd1S4QOuAI?utm_source=generator&theme=0" 
+                width="100%" 
+                height="152" 
+                frameBorder="0" 
+                allowFullScreen="" 
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy"
+                title="Victor's Spotify Playlist"
+              />
+            </div>
+
+            {/* External Spotify Button */}
+            <a
+              href={spotifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 px-4 rounded-xl bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md shadow-[#1DB954]/20"
+            >
+              <span>Listen on Spotify</span>
+              <ExternalLink size={15} />
+            </a>
+          </div>
+
+          {/* Card 2: 🎮 Favorite Game (Blood Strike) */}
+          <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-charcoal via-charcoal to-red-950/20 border border-red-500/25 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-36 h-36 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center">
+                  <Gamepad2 size={20} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-red-400">🎮 Favorite Game</span>
+                  <h3 className="text-base font-bold text-textPrimary leading-tight">Blood Strike</h3>
+                </div>
+              </div>
+
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/15 text-red-400 text-[10px] font-bold uppercase tracking-wider border border-red-500/30">
+                <Flame size={12} />
+                <span>FPS Battle Royale</span>
+              </span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/[0.06] mb-4">
+              <p className="text-xs sm:text-sm text-textPrimary leading-relaxed italic">
+                “Fast-paced matches, chaotic gunfights, and just enough <span className="text-red-400 font-semibold">‘one more game’</span> energy to destroy a perfectly good sleep schedule. 😭🎮”
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-white/[0.05] text-textSecondary border border-white/5">
+                ⚡ Fast-Paced Combat
+              </span>
+              <span className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-white/[0.05] text-textSecondary border border-white/5">
+                🎯 Tactical Gunplay
+              </span>
+              <span className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-white/[0.05] text-textSecondary border border-white/5">
+                🔥 High Adrenaline
+              </span>
+            </div>
+          </div>
+
+        </motion.div>
+
+      </div>
+    </section>
+  );
+};
+
+export default About;
