@@ -1,9 +1,10 @@
 import express from 'express';
 import Analytics from '../models/Analytics.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Record a new page view
+// Record a new page view (Public)
 router.post('/view', async (req, res) => {
   try {
     const { countryCode = 'Unknown' } = req.body || {};
@@ -42,15 +43,14 @@ router.post('/view', async (req, res) => {
   }
 });
 
-// Get analytics stats for Admin
-router.get('/', async (req, res) => {
+// Helper for full analytics (Admin)
+const handleFullAnalytics = async (req, res) => {
   try {
     let analytics = await Analytics.findOne();
     if (!analytics) {
       analytics = await Analytics.create({ totalViews: 0, viewsHistory: [], countryBreakdown: {} });
     }
 
-    // Calculate views today
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const viewsToday = analytics.viewsHistory.filter(v => new Date(v.timestamp) >= startOfToday).length;
@@ -65,6 +65,34 @@ router.get('/', async (req, res) => {
     console.error('Get analytics error:', error);
     res.status(500).json({ error: 'Failed to retrieve analytics' });
   }
+};
+
+// Helper for public analytics summary (Non-sensitive aggregated counts only)
+const handlePublicAnalytics = async (req, res) => {
+  try {
+    let analytics = await Analytics.findOne();
+    if (!analytics) {
+      return res.json({ totalViews: 0, countryBreakdown: {} });
+    }
+    res.json({
+      totalViews: analytics.totalViews,
+      countryBreakdown: Object.fromEntries(analytics.countryBreakdown || new Map())
+    });
+  } catch (error) {
+    console.error('Public analytics error:', error);
+    res.status(500).json({ error: 'Failed to retrieve summary analytics' });
+  }
+};
+
+// Analytics stats route:
+// - With Admin Bearer Token: Returns full detailed analytics including visitor logs and viewsToday
+// - Without Token: Returns aggregated count only for public visitor widget
+router.get('/', (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return requireAuth(req, res, () => handleFullAnalytics(req, res));
+  }
+  return handlePublicAnalytics(req, res);
 });
 
 export default router;

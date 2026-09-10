@@ -1,5 +1,6 @@
 import express from 'express';
 import SiteContent from '../models/SiteContent.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -17,8 +18,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// UPDATE Site Content
-router.put('/', async (req, res) => {
+// UPDATE Site Content (Admin only)
+router.put('/', requireAuth, async (req, res) => {
   try {
     let content = await SiteContent.findOne();
     if (!content) {

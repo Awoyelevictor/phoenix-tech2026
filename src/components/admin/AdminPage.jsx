@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  adminLogin, 
+  adminLogin,
+  adminLogout,
   getAnalytics, 
   getSiteContent, 
   updateSiteContent, 
@@ -34,7 +35,7 @@ import {
 
 const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem('admin_auth') === 'true';
+    return sessionStorage.getItem('admin_auth') === 'true' && Boolean(sessionStorage.getItem('admin_token'));
   });
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -110,19 +111,13 @@ const AdminPage = () => {
       sessionStorage.setItem('admin_auth', 'true');
       showToast('Welcome back, Admin!');
     } catch (err) {
-      if (password === 'admin123') {
-        setIsAuthenticated(true);
-        sessionStorage.setItem('admin_auth', 'true');
-        showToast('Logged in successfully!');
-      } else {
-        setLoginError('Invalid password. Default is admin123');
-      }
+      setLoginError(err.message || 'Invalid admin credentials');
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    sessionStorage.removeItem('admin_auth');
+    adminLogout();
     setPassword('');
   };
 
@@ -428,7 +423,7 @@ const AdminPage = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password (default: admin123)"
+                placeholder="Enter admin password"
                 required
                 className="w-full px-4 py-3.5 bg-darkBg border border-white/10 rounded-xl text-sm text-textPrimary placeholder:text-textMuted focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
               />

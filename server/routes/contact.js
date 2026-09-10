@@ -1,11 +1,25 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
-import Message from '../models/Message.js';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import Message from '../models/Message.js';
+import { requireAuth } from '../middleware/auth.js';
 
 dotenv.config();
 
 const router = express.Router();
+
+// Rate limiter for contact form submissions to prevent spam (5 messages per 10 minutes per IP)
+const contactLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many messages sent from this IP. Please wait a few minutes before trying again.'
+  }
+});
 
 // Helper to create Nodemailer transporter
 const createTransporter = () => {
@@ -21,8 +35,8 @@ const createTransporter = () => {
   });
 };
 
-// Send message & email notification
-router.post('/', async (req, res) => {
+// Send message & email notification (Public, with spam rate limiting)
+router.post('/', contactLimiter, async (req, res) => {
   const { name, email, message } = req.body;
 
   if (!name || !email || !message) {
@@ -53,7 +67,7 @@ router.post('/', async (req, res) => {
             <p style="margin: 0; line-height: 1.6; color: #ffffff; white-space: pre-wrap;">${message}</p>
           </div>
           <p style="margin-top: 24px; font-size: 12px; color: #71717a; text-align: center;">
-            Sent automatically from your portfolio at victor.dev
+            Sent automatically from your portfolio website
           </p>
         </div>
       `
@@ -76,8 +90,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET all contact messages (Admin)
-router.get('/messages', async (req, res) => {
+// GET all contact messages (Admin only - Protected)
+router.get('/messages', requireAuth, async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
     res.json(messages);
@@ -87,10 +101,11 @@ router.get('/messages', async (req, res) => {
   }
 });
 
-// MARK message as read
-router.put('/messages/:id/read', async (req, res) => {
+// MARK message as read (Admin only - Protected)
+router.put('/messages/:id/read', requireAuth, async (req, res) => {
   try {
     const updated = await Message.findByIdAndUpdate(req.params.id, { read: true }, { new: true });
+    if (!updated) return res.status(404).json({ error: 'Message not found' });
     res.json(updated);
   } catch (error) {
     console.error('Error marking message read:', error);
@@ -98,10 +113,11 @@ router.put('/messages/:id/read', async (req, res) => {
   }
 });
 
-// DELETE message
-router.delete('/messages/:id', async (req, res) => {
+// DELETE message (Admin only - Protected)
+router.delete('/messages/:id', requireAuth, async (req, res) => {
   try {
-    await Message.findByIdAndDelete(req.params.id);
+    const deleted = await Message.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Message not found' });
     res.json({ success: true, message: 'Message deleted' });
   } catch (error) {
     console.error('Error deleting message:', error);

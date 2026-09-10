@@ -1,5 +1,6 @@
 import express from 'express';
 import Project from '../models/Project.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -117,8 +118,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// CREATE new project
-router.post('/', async (req, res) => {
+// CREATE new project (Admin only)
+router.post('/', requireAuth, async (req, res) => {
   try {
     const { name, description, technologies, github, liveUrl, gradientFrom, gradientTo, icon, image, featured } = req.body;
     if (!name || !description) {
@@ -146,8 +147,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// UPDATE project
-router.put('/:id', async (req, res) => {
+// UPDATE project (Admin only)
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { name, description, technologies, github, liveUrl, gradientFrom, gradientTo, icon, image, featured } = req.body;
     
@@ -177,8 +178,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE project
-router.delete('/:id', async (req, res) => {
+// DELETE project (Admin only)
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const deleted = await Project.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: 'Project not found' });

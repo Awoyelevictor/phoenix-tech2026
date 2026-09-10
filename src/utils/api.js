@@ -4,6 +4,27 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
   : '/api';
 
+// --- Auth Token Management ---
+export const getAdminToken = () => {
+  return sessionStorage.getItem('admin_token') || '';
+};
+
+export const setAdminToken = (token) => {
+  if (token) {
+    sessionStorage.setItem('admin_token', token);
+  } else {
+    sessionStorage.removeItem('admin_token');
+  }
+};
+
+const getAuthHeaders = (extraHeaders = {}) => {
+  const token = getAdminToken();
+  return {
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...extraHeaders,
+  };
+};
+
 // --- Contact & Messages ---
 export const sendContactMessage = async (formData) => {
   const response = await fetch(`${API_BASE_URL}/contact`, {
@@ -11,27 +32,43 @@ export const sendContactMessage = async (formData) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData),
   });
-  if (!response.ok) throw new Error('Failed to send message');
-  return await response.json();
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to send message');
+  return data;
 };
 
 export const getMessages = async () => {
-  const response = await fetch(`${API_BASE_URL}/contact/messages`);
-  if (!response.ok) throw new Error('Failed to fetch messages');
+  const response = await fetch(`${API_BASE_URL}/contact/messages`, {
+    headers: getAuthHeaders()
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to fetch messages');
+  }
   return await response.json();
 };
 
 export const markMessageRead = async (id) => {
   const response = await fetch(`${API_BASE_URL}/contact/messages/${id}/read`, {
-    method: 'PUT'
+    method: 'PUT',
+    headers: getAuthHeaders()
   });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to update message');
+  }
   return await response.json();
 };
 
 export const deleteMessage = async (id) => {
   const response = await fetch(`${API_BASE_URL}/contact/messages/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: getAuthHeaders()
   });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to delete message');
+  }
   return await response.json();
 };
 
@@ -51,7 +88,9 @@ export const recordPageView = async (countryCode = 'Unknown') => {
 };
 
 export const getAnalytics = async () => {
-  const response = await fetch(`${API_BASE_URL}/analytics`);
+  const response = await fetch(`${API_BASE_URL}/analytics`, {
+    headers: getAuthHeaders()
+  });
   if (!response.ok) throw new Error('Failed to fetch analytics');
   return await response.json();
 };
@@ -66,10 +105,13 @@ export const getSiteContent = async () => {
 export const updateSiteContent = async (contentData) => {
   const response = await fetch(`${API_BASE_URL}/content`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(contentData),
   });
-  if (!response.ok) throw new Error('Failed to update content');
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to update site content');
+  }
   return await response.json();
 };
 
@@ -83,28 +125,38 @@ export const getProjects = async () => {
 export const createProject = async (projectData) => {
   const response = await fetch(`${API_BASE_URL}/projects`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(projectData),
   });
-  if (!response.ok) throw new Error('Failed to create project');
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to create project');
+  }
   return await response.json();
 };
 
 export const updateProject = async (id, projectData) => {
   const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(projectData),
   });
-  if (!response.ok) throw new Error('Failed to update project');
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to update project');
+  }
   return await response.json();
 };
 
 export const deleteProject = async (id) => {
   const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: getAuthHeaders()
   });
-  if (!response.ok) throw new Error('Failed to delete project');
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to delete project');
+  }
   return await response.json();
 };
 
@@ -117,5 +169,13 @@ export const adminLogin = async (password) => {
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || 'Authentication failed');
+  if (data.token) {
+    setAdminToken(data.token);
+  }
   return data;
+};
+
+export const adminLogout = () => {
+  setAdminToken(null);
+  sessionStorage.removeItem('admin_auth');
 };
