@@ -1,5 +1,6 @@
 // Use relative URL so it works on both localhost and production (Render)
 // When served from Express, /api calls go to the same server
+// In Vite dev, vite.config.js proxies /api to http://localhost:5001
 const API_BASE_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
   : '/api';
@@ -25,6 +26,18 @@ const getAuthHeaders = (extraHeaders = {}) => {
   };
 };
 
+// Safe JSON parser to handle non-JSON / HTML / offline responses gracefully
+const safeJsonParse = async (response) => {
+  try {
+    return await response.json();
+  } catch (e) {
+    if (!response.ok) {
+      throw new Error(`Server error ${response.status} (${response.statusText || 'Not Found'}). Is the backend running on port 5001?`);
+    }
+    throw new Error('Unexpected non-JSON response from server.');
+  }
+};
+
 // --- Contact & Messages ---
 export const sendContactMessage = async (formData) => {
   const response = await fetch(`${API_BASE_URL}/contact`, {
@@ -32,7 +45,7 @@ export const sendContactMessage = async (formData) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData),
   });
-  const data = await response.json();
+  const data = await safeJsonParse(response);
   if (!response.ok) throw new Error(data.error || 'Failed to send message');
   return data;
 };
@@ -41,11 +54,9 @@ export const getMessages = async () => {
   const response = await fetch(`${API_BASE_URL}/contact/messages`, {
     headers: getAuthHeaders()
   });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || 'Failed to fetch messages');
-  }
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to fetch messages');
+  return data;
 };
 
 export const markMessageRead = async (id) => {
@@ -53,11 +64,9 @@ export const markMessageRead = async (id) => {
     method: 'PUT',
     headers: getAuthHeaders()
   });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || 'Failed to update message');
-  }
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to update message');
+  return data;
 };
 
 export const deleteMessage = async (id) => {
@@ -65,11 +74,9 @@ export const deleteMessage = async (id) => {
     method: 'DELETE',
     headers: getAuthHeaders()
   });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || 'Failed to delete message');
-  }
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to delete message');
+  return data;
 };
 
 // --- Analytics ---
@@ -80,7 +87,7 @@ export const recordPageView = async (countryCode = 'Unknown') => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ countryCode })
     });
-    return await response.json();
+    return await safeJsonParse(response);
   } catch (error) {
     console.debug('Analytics offline/local:', error);
     return null;
@@ -91,15 +98,17 @@ export const getAnalytics = async () => {
   const response = await fetch(`${API_BASE_URL}/analytics`, {
     headers: getAuthHeaders()
   });
-  if (!response.ok) throw new Error('Failed to fetch analytics');
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to fetch analytics');
+  return data;
 };
 
 // --- Site Content ---
 export const getSiteContent = async () => {
   const response = await fetch(`${API_BASE_URL}/content`);
-  if (!response.ok) throw new Error('Failed to fetch content');
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to fetch content');
+  return data;
 };
 
 export const updateSiteContent = async (contentData) => {
@@ -108,18 +117,17 @@ export const updateSiteContent = async (contentData) => {
     headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(contentData),
   });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || 'Failed to update site content');
-  }
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to update site content');
+  return data;
 };
 
 // --- Projects ---
 export const getProjects = async () => {
   const response = await fetch(`${API_BASE_URL}/projects`);
-  if (!response.ok) throw new Error('Failed to fetch projects');
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to fetch projects');
+  return data;
 };
 
 export const createProject = async (projectData) => {
@@ -128,11 +136,9 @@ export const createProject = async (projectData) => {
     headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(projectData),
   });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || 'Failed to create project');
-  }
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to create project');
+  return data;
 };
 
 export const updateProject = async (id, projectData) => {
@@ -141,11 +147,9 @@ export const updateProject = async (id, projectData) => {
     headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(projectData),
   });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || 'Failed to update project');
-  }
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to update project');
+  return data;
 };
 
 export const deleteProject = async (id) => {
@@ -153,11 +157,9 @@ export const deleteProject = async (id) => {
     method: 'DELETE',
     headers: getAuthHeaders()
   });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || 'Failed to delete project');
-  }
-  return await response.json();
+  const data = await safeJsonParse(response);
+  if (!response.ok) throw new Error(data.error || 'Failed to delete project');
+  return data;
 };
 
 // --- Admin Auth ---
@@ -167,7 +169,7 @@ export const adminLogin = async (password) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password }),
   });
-  const data = await response.json();
+  const data = await safeJsonParse(response);
   if (!response.ok) throw new Error(data.error || 'Authentication failed');
   if (data.token) {
     setAdminToken(data.token);
