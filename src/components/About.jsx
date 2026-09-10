@@ -138,6 +138,7 @@ const About = ({ aboutData, phone, whatsapp }) => {
 
         {/* Right Column: Interactive Bento Cards (Fave Music & Game) (5 Cols) */}
         <motion.div
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7, delay: 0.15 }}
