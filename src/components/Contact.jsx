@@ -241,7 +241,7 @@ const Contact = ({ socials = portfolioDataRaw.socials }) => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="lg:col-span-7 lg:mt-28 mt-8"
+          className="lg:col-span-7 lg:mt-80 mt-80"
         >
           <div className="bg-charcoal/70 p-8 sm:p-10 rounded-3xl border border-white/[0.08] backdrop-blur-xl shadow-2xl relative overflow-hidden">
             {/* Top subtle highlight */}

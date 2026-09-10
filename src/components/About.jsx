@@ -3,9 +3,6 @@ import { motion } from 'framer-motion';
 import { 
   Sparkles, 
   Terminal, 
-  Code2, 
-  Cpu, 
-  ShieldCheck, 
   Headphones, 
   Gamepad2, 
   ExternalLink, 
@@ -31,16 +28,15 @@ const About = ({ aboutData, phone, whatsapp }) => {
   };
 
   const focusPills = [
-    { label: "Frontend & UI Engineering", icon: Code2, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
+    { label: "Frontend & UI Engineering", icon: Terminal, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
     { label: "Full-Stack Web Systems", icon: Terminal, color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
-    { label: "AI & NLP Solutions", icon: Cpu, color: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
-    { label: "Cybersecurity & Logic", icon: ShieldCheck, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+    { label: "AI & NLP Solutions", icon: Terminal, color: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
+    { label: "Cybersecurity & Logic", icon: Terminal, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
   ];
 
   return (
     <section id="about" className="py-28 px-6 relative z-10 max-w-7xl mx-auto overflow-hidden">
       {/* Subtle Background Glows */}
-      <div className="absolute top-1/3 -left-32 w-96 h-96 bg-accent/10 rounded-full blur-[140px] pointer-events-none -z-10" />
       <div className="absolute bottom-10 right-0 w-80 h-80 bg-purple-600/10 rounded-full blur-[140px] pointer-events-none -z-10" />
 
       {/* Section Header */}
@@ -138,73 +134,10 @@ const About = ({ aboutData, phone, whatsapp }) => {
             </div>
           </div>
 
-          {/* Currently Status Card */}
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-accent/10 via-purple-500/5 to-transparent border border-accent/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-accent/20 text-accent flex items-center justify-center shrink-0 mt-0.5">
-                <Terminal size={18} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-accent">Current Status</p>
-                  <span className="inline-block w-2 h-2 rounded-full bg-accent animate-ping" />
-                </div>
-                <p className="text-sm font-medium text-textPrimary mt-0.5 leading-snug">
-                  Building, learning, experimenting, and preparing for the next level of my journey in software engineering, AI, and cybersecurity.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Direct Actions: WhatsApp & Call */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-4 rounded-2xl bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#25D366] flex items-center justify-between group transition-all duration-300 hover:shadow-lg hover:shadow-[#25D366]/10"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#25D366]/20 flex items-center justify-center text-[#25D366] group-hover:scale-110 transition-transform">
-                  <MessageCircle size={20} />
-                </div>
-                <div>
-                  <p className="text-xs uppercase font-semibold text-textMuted tracking-wider">Chat Directly</p>
-                  <p className="text-sm font-bold text-textPrimary group-hover:text-[#25D366] transition-colors">WhatsApp Chat</p>
-                </div>
-              </div>
-              <ArrowRight size={16} className="text-[#25D366] group-hover:translate-x-1 transition-transform" />
-            </a>
-
-            <div className="p-4 rounded-2xl bg-charcoal/60 border border-white/[0.08] flex items-center justify-between">
-              <a 
-                href={`tel:${phoneNumber}`}
-                className="flex items-center gap-3 min-w-0 group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform shrink-0">
-                  <Phone size={18} />
-                </div>
-                <div className="truncate">
-                  <p className="text-xs uppercase font-semibold text-textMuted tracking-wider">Call Me</p>
-                  <p className="text-sm font-bold text-textPrimary group-hover:text-accent transition-colors truncate">
-                    {phoneNumber}
-                  </p>
-                </div>
-              </a>
-              <button
-                onClick={handleCopyPhone}
-                className="p-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-textSecondary hover:text-white transition-colors shrink-0 ml-2"
-                title="Copy phone number"
-              >
-                {copiedPhone ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
-              </button>
-            </div>
-          </div>
         </motion.div>
 
         {/* Right Column: Interactive Bento Cards (Fave Music & Game) (5 Cols) */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7, delay: 0.15 }}
