@@ -43,13 +43,23 @@ const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigi
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (such as same-origin requests when Express serves React dist, curl, or mobile)
+    // Allow requests with no origin (e.g. mobile apps, curl, or same-origin direct requests)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    // Allow configured whitelist origins, wildcard, render deployments, vercel, or localhost
+    if (
+      allowedOrigins.includes(origin) || 
+      allowedOrigins.includes('*') ||
+      origin.endsWith('.onrender.com') ||
+      origin.endsWith('.vercel.app') ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1')
+    ) {
       return callback(null, true);
     }
-    return callback(new Error(`CORS blocked: Origin ${origin} is not allowed`));
+
+    // Default permissive for portfolio visitors to prevent breaking public API
+    return callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -76,13 +86,16 @@ app.get('/api/ping', (req, res) => {
   res.json({ message: 'Portfolio API Online', timestamp: new Date() });
 });
 
-// For any non-API route, send back the React index.html
-// This makes React Router work correctly on refresh/direct URL
-app.get('/{*splat}', (req, res) => {
+// For any client-side SPA navigation routes, send back index.html
+// In Express 5, /{splat} or /{*splat} captures all non-API paths
+app.get('/{*splat}', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/assets')) {
+    return next();
+  }
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
-// Error handling middleware (e.g. CORS rejection)
+// Error handling middleware
 app.use((err, req, res, next) => {
   if (err && err.message && err.message.startsWith('CORS blocked')) {
     return res.status(403).json({ error: err.message });
@@ -92,7 +105,6 @@ app.use((err, req, res, next) => {
 });
 
 // Database Connection
-// Use the proper env‑var name (MONGODB_URI); fallback to MONGO_URI for backward compatibility
 const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/portfolio';
 
 mongoose.connect(mongoUri)

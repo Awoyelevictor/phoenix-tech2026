@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Sparkles, 
@@ -6,26 +5,30 @@ import {
   Headphones, 
   Gamepad2, 
   ExternalLink, 
-  Phone, 
-  MessageCircle, 
-  Copy, 
-  Check, 
-  Flame,
-  ArrowRight
+  Flame
 } from 'lucide-react';
 
-const About = ({ aboutData, phone, whatsapp }) => {
-  const [copiedPhone, setCopiedPhone] = useState(false);
+const defaultParagraphs = [
+  "I’m Awoyele Victor Ayomide, a Computer Science student and software developer passionate about building practical, modern digital solutions.",
+  "My main focus is frontend development, where I work with technologies like React.js, JavaScript, Tailwind CSS, and modern web APIs to create responsive and user-friendly experiences. I also enjoy working with Node.js, Laravel, MongoDB, MySQL, and REST APIs to understand and build complete systems beyond the interface.",
+  "I’m particularly interested in Artificial Intelligence, Natural Language Processing, and Cybersecurity. I enjoy exploring how AI can solve real-world problems and how secure, intelligent systems can make technology more accessible and useful.",
+  "I believe good software should not only look good — it should solve a real problem, work reliably, and be built with purpose. I’m constantly learning, experimenting with new technologies, and turning ideas into working projects."
+];
 
-  const phoneNumber = phone || "+2347017304536";
-  const whatsappUrl = whatsapp || "https://wa.me/2347017304536?text=Hi%20Victor,%20I%20saw%20your%20portfolio!";
-  const spotifyUrl = aboutData?.faveMusic?.url || "https://open.spotify.com/playlist/2yiM4AjKi0kROd1S4QOuAI";
+const About = ({ aboutData }) => {
+  const paragraphs = Array.isArray(aboutData?.paragraphs) && aboutData.paragraphs.length > 0 
+    ? aboutData.paragraphs 
+    : defaultParagraphs;
 
-  const handleCopyPhone = () => {
-    navigator.clipboard.writeText(phoneNumber);
-    setCopiedPhone(true);
-    setTimeout(() => setCopiedPhone(false), 3000);
-  };
+  const musicTitle = aboutData?.faveMusic?.title || "🎧 My Fave";
+  const musicSubtitle = aboutData?.faveMusic?.subtitle || "Vibes & Coding Soundtrack";
+  const musicDesc = aboutData?.faveMusic?.description || "A little window into my taste — the songs I keep coming back to while coding, building, thinking, or just vibing.";
+  const spotifyUrl = aboutData?.faveMusic?.url || aboutData?.faveMusic?.playlistUrl || "https://open.spotify.com/playlist/2yiM4AjKi0kROd1S4QOuAI";
+  const spotifyEmbedUrl = aboutData?.faveMusic?.embedUrl || "https://open.spotify.com/embed/playlist/2yiM4AjKi0kROd1S4QOuAI?utm_source=generator&theme=0";
+
+  const gameTitle = aboutData?.faveGame?.title || "Blood Strike";
+  const gameTag = aboutData?.faveGame?.tag || "FPS Battle Royale";
+  const gameDesc = aboutData?.faveGame?.description || "Fast-paced matches, chaotic gunfights, and just enough 'one more game' energy to destroy a perfectly good sleep schedule. 😭🎮";
 
   const focusPills = [
     { label: "Frontend & UI Engineering", icon: Terminal, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
@@ -97,21 +100,14 @@ const About = ({ aboutData, phone, whatsapp }) => {
             </div>
 
             <div className="space-y-4 text-textSecondary text-sm sm:text-base leading-relaxed font-normal">
-              <p className="text-textPrimary font-medium text-base sm:text-lg">
-                I’m <strong className="text-white font-bold">Awoyele Victor Ayomide</strong>, a Computer Science student and software developer passionate about building practical, modern digital solutions.
-              </p>
-
-              <p>
-                My main focus is <span className="text-textPrimary font-semibold">frontend development</span>, where I work with technologies like React.js, JavaScript, Tailwind CSS, and modern web APIs to create responsive and user-friendly experiences. I also enjoy working with Node.js, Laravel, MongoDB, MySQL, and REST APIs to understand and build complete systems beyond the interface.
-              </p>
-
-              <p>
-                I’m particularly interested in <span className="text-accent font-semibold">Artificial Intelligence</span>, <span className="text-purple-400 font-semibold">Natural Language Processing</span>, and <span className="text-cyan-400 font-semibold">Cybersecurity</span>. I enjoy exploring how AI can solve real-world problems and how secure, intelligent systems can make technology more accessible and useful.
-              </p>
-
-              <p className="border-l-2 border-accent/40 pl-4 italic text-textMuted text-xs sm:text-sm my-2">
-                "I believe good software should not only look good — it should solve a real problem, work reliably, and be built with purpose. I’m constantly learning, experimenting with new technologies, and turning ideas into working projects."
-              </p>
+              {paragraphs.map((p, idx) => (
+                <p 
+                  key={idx} 
+                  className={idx === 0 ? "text-textPrimary font-medium text-base sm:text-lg" : (idx === paragraphs.length - 1 ? "border-l-2 border-accent/40 pl-4 italic text-textMuted text-xs sm:text-sm my-2" : "")}
+                >
+                  {p}
+                </p>
+              ))}
             </div>
 
             {/* Core Competencies Badges */}
@@ -155,9 +151,9 @@ const About = ({ aboutData, phone, whatsapp }) => {
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#1DB954]">🎧 My Fave</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#1DB954]">{musicTitle}</span>
                   </div>
-                  <h3 className="text-base font-bold text-textPrimary leading-tight">Vibes & Coding Soundtrack</h3>
+                  <h3 className="text-base font-bold text-textPrimary leading-tight">{musicSubtitle}</h3>
                 </div>
               </div>
 
@@ -171,14 +167,14 @@ const About = ({ aboutData, phone, whatsapp }) => {
             </div>
 
             <p className="text-xs sm:text-sm text-textSecondary leading-relaxed mb-5">
-              A little window into my taste — the songs I keep coming back to while coding, building, thinking, or just vibing.
+              {musicDesc}
             </p>
 
             {/* Embedded Spotify Compact Player */}
             <div className="rounded-2xl overflow-hidden border border-white/10 shadow-inner bg-black/40 mb-4">
               <iframe 
                 style={{ borderRadius: '12px' }} 
-                src="https://open.spotify.com/embed/playlist/2yiM4AjKi0kROd1S4QOuAI?utm_source=generator&theme=0" 
+                src={spotifyEmbedUrl} 
                 width="100%" 
                 height="152" 
                 frameBorder="0" 
@@ -201,7 +197,7 @@ const About = ({ aboutData, phone, whatsapp }) => {
             </a>
           </div>
 
-          {/* Card 2: 🎮 Favorite Game (Blood Strike) */}
+          {/* Card 2: 🎮 Favorite Game */}
           <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-charcoal via-charcoal to-red-950/20 border border-red-500/25 shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-36 h-36 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -212,19 +208,19 @@ const About = ({ aboutData, phone, whatsapp }) => {
                 </div>
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-red-400">🎮 Favorite Game</span>
-                  <h3 className="text-base font-bold text-textPrimary leading-tight">Blood Strike</h3>
+                  <h3 className="text-base font-bold text-textPrimary leading-tight">{gameTitle}</h3>
                 </div>
               </div>
 
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/15 text-red-400 text-[10px] font-bold uppercase tracking-wider border border-red-500/30">
                 <Flame size={12} />
-                <span>FPS Battle Royale</span>
+                <span>{gameTag}</span>
               </span>
             </div>
 
             <div className="p-4 rounded-2xl bg-black/40 border border-white/[0.06] mb-4">
               <p className="text-xs sm:text-sm text-textPrimary leading-relaxed italic">
-                “Fast-paced matches, chaotic gunfights, and just enough <span className="text-red-400 font-semibold">‘one more game’</span> energy to destroy a perfectly good sleep schedule. 😭🎮”
+                “{gameDesc}”
               </p>
             </div>
 

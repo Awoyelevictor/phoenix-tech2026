@@ -138,8 +138,6 @@ function PortfolioApp() {
           
           <About 
             aboutData={portfolio?.about}
-            phone={portfolio?.phone}
-            whatsapp={portfolio?.whatsapp}
           />
 
           <Projects 

@@ -393,6 +393,82 @@ const AdminPage = () => {
     });
   };
 
+  const updateAboutParagraph = (index, value) => {
+    setContent(prev => {
+      const paragraphs = [...(prev.about?.paragraphs || portfolioDataRaw.about?.paragraphs || [])];
+      paragraphs[index] = value;
+      return {
+        ...prev,
+        about: {
+          ...(prev.about || {}),
+          paragraphs
+        }
+      };
+    });
+  };
+
+  const addAboutParagraph = () => {
+    setContent(prev => {
+      const paragraphs = [...(prev.about?.paragraphs || portfolioDataRaw.about?.paragraphs || []), ''];
+      return {
+        ...prev,
+        about: {
+          ...(prev.about || {}),
+          paragraphs
+        }
+      };
+    });
+  };
+
+  const removeAboutParagraph = (index) => {
+    setContent(prev => {
+      const paragraphs = (prev.about?.paragraphs || portfolioDataRaw.about?.paragraphs || []).filter((_, i) => i !== index);
+      return {
+        ...prev,
+        about: {
+          ...(prev.about || {}),
+          paragraphs
+        }
+      };
+    });
+  };
+
+  const updateFaveMusic = (field, value) => {
+    setContent(prev => ({
+      ...prev,
+      about: {
+        ...(prev.about || {}),
+        faveMusic: {
+          ...(prev.about?.faveMusic || portfolioDataRaw.about?.faveMusic || {}),
+          [field]: value
+        }
+      }
+    }));
+  };
+
+  const updateFaveGame = (field, value) => {
+    setContent(prev => ({
+      ...prev,
+      about: {
+        ...(prev.about || {}),
+        faveGame: {
+          ...(prev.about?.faveGame || portfolioDataRaw.about?.faveGame || {}),
+          [field]: value
+        }
+      }
+    }));
+  };
+
+  const updateSocial = (field, value) => {
+    setContent(prev => ({
+      ...prev,
+      socials: {
+        ...(prev.socials || {}),
+        [field]: value
+      }
+    }));
+  };
+
   // --- LOGIN SCREEN ---
   if (!isAuthenticated) {
     return (
@@ -745,6 +821,231 @@ const AdminPage = () => {
                     value={content.bio || ''}
                     onChange={(e) => setContent(prev => ({ ...prev, bio: e.target.value }))}
                     className="w-full px-4 py-3 bg-darkBg border border-white/10 rounded-xl text-sm text-textPrimary focus:border-accent focus:outline-none resize-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* --- ABOUT SECTION & PERSONAL HIGHLIGHTS EDITOR --- */}
+            <div className="bg-charcoal/70 p-8 rounded-3xl border border-white/[0.08] space-y-6">
+              <h2 className="text-xl font-bold text-textPrimary pb-4 border-b border-white/[0.08]">
+                About Me Section & Highlights
+              </h2>
+
+              {/* About Paragraphs */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider block">
+                    About Narrative Paragraphs
+                  </label>
+                  <button
+                    type="button"
+                    onClick={addAboutParagraph}
+                    className="px-3 py-1.5 bg-accent/20 hover:bg-accent text-accent hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                  >
+                    <AnimatedPlus size={12} />
+                    <span>Add Paragraph</span>
+                  </button>
+                </div>
+
+                {(content.about?.paragraphs || portfolioDataRaw.about?.paragraphs || []).map((p, idx) => (
+                  <div key={idx} className="flex gap-3 items-start">
+                    <span className="w-6 h-6 rounded-lg bg-white/[0.06] text-textMuted text-xs flex items-center justify-center font-mono mt-2 shrink-0">
+                      {idx + 1}
+                    </span>
+                    <textarea
+                      rows={3}
+                      value={p}
+                      onChange={(e) => updateAboutParagraph(idx, e.target.value)}
+                      placeholder={`Paragraph ${idx + 1}...`}
+                      className="flex-1 px-4 py-3 bg-darkBg border border-white/10 rounded-xl text-xs sm:text-sm text-textPrimary focus:border-accent focus:outline-none resize-y"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeAboutParagraph(idx)}
+                      className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all mt-2 cursor-pointer"
+                      title="Remove paragraph"
+                    >
+                      <AnimatedTrash size={14} color="#f87171" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Music / Spotify Bento Box Editor */}
+              <div className="pt-6 border-t border-white/[0.06] space-y-4">
+                <h3 className="text-sm font-bold text-[#1DB954] flex items-center gap-2">
+                  <span>🎧 Spotify / Favorite Music Bento Card</span>
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] font-semibold text-textMuted uppercase tracking-wider mb-1 block">
+                      Card Badge / Title
+                    </label>
+                    <input
+                      type="text"
+                      value={content.about?.faveMusic?.title || '🎧 My Fave'}
+                      onChange={(e) => updateFaveMusic('title', e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-semibold text-textMuted uppercase tracking-wider mb-1 block">
+                      Card Heading / Subtitle
+                    </label>
+                    <input
+                      type="text"
+                      value={content.about?.faveMusic?.subtitle || 'Vibes & Coding Soundtrack'}
+                      onChange={(e) => updateFaveMusic('subtitle', e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="text-[11px] font-semibold text-textMuted uppercase tracking-wider mb-1 block">
+                      Description Text
+                    </label>
+                    <input
+                      type="text"
+                      value={content.about?.faveMusic?.description || 'A little window into my taste — the songs I keep coming back to while coding, building, thinking, or just vibing.'}
+                      onChange={(e) => updateFaveMusic('description', e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-semibold text-textMuted uppercase tracking-wider mb-1 block">
+                      Spotify Playlist / Track Link
+                    </label>
+                    <input
+                      type="url"
+                      value={content.about?.faveMusic?.url || 'https://open.spotify.com/playlist/2yiM4AjKi0kROd1S4QOuAI'}
+                      onChange={(e) => updateFaveMusic('url', e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-semibold text-textMuted uppercase tracking-wider mb-1 block">
+                      Spotify Embed URL (for audio player)
+                    </label>
+                    <input
+                      type="url"
+                      value={content.about?.faveMusic?.embedUrl || 'https://open.spotify.com/embed/playlist/2yiM4AjKi0kROd1S4QOuAI?utm_source=generator&theme=0'}
+                      onChange={(e) => updateFaveMusic('embedUrl', e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Game Bento Box Editor */}
+              <div className="pt-6 border-t border-white/[0.06] space-y-4">
+                <h3 className="text-sm font-bold text-red-400 flex items-center gap-2">
+                  <span>🎮 Favorite Game Bento Card</span>
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] font-semibold text-textMuted uppercase tracking-wider mb-1 block">
+                      Game Name
+                    </label>
+                    <input
+                      type="text"
+                      value={content.about?.faveGame?.title || 'Blood Strike'}
+                      onChange={(e) => updateFaveGame('title', e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-semibold text-textMuted uppercase tracking-wider mb-1 block">
+                      Game Genre / Tag Badge
+                    </label>
+                    <input
+                      type="text"
+                      value={content.about?.faveGame?.tag || 'FPS Battle Royale'}
+                      onChange={(e) => updateFaveGame('tag', e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="text-[11px] font-semibold text-textMuted uppercase tracking-wider mb-1 block">
+                      Game Quote / Description
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={content.about?.faveGame?.description || 'Fast-paced matches, chaotic gunfights, and just enough “one more game” energy to destroy a perfectly good sleep schedule. 😭🎮'}
+                      onChange={(e) => updateFaveGame('description', e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-darkBg border border-white/10 rounded-xl text-xs text-textPrimary focus:border-accent focus:outline-none resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* --- SOCIAL LINKS & CONTACTS EDITOR --- */}
+            <div className="bg-charcoal/70 p-8 rounded-3xl border border-white/[0.08] space-y-6">
+              <h2 className="text-xl font-bold text-textPrimary pb-4 border-b border-white/[0.08]">
+                Social & Contact Links
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider mb-2 block">
+                    WhatsApp URL / Link
+                  </label>
+                  <input
+                    type="text"
+                    value={content.socials?.whatsapp || ''}
+                    onChange={(e) => updateSocial('whatsapp', e.target.value)}
+                    placeholder="https://wa.me/2347017304536"
+                    className="w-full px-4 py-3 bg-darkBg border border-white/10 rounded-xl text-sm text-textPrimary focus:border-accent focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider mb-2 block">
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    value={content.socials?.phone || content.phone || ''}
+                    onChange={(e) => {
+                      updateSocial('phone', e.target.value);
+                      setContent(prev => ({ ...prev, phone: e.target.value }));
+                    }}
+                    placeholder="+2347017304536"
+                    className="w-full px-4 py-3 bg-darkBg border border-white/10 rounded-xl text-sm text-textPrimary focus:border-accent focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider mb-2 block">
+                    GitHub Profile URL
+                  </label>
+                  <input
+                    type="url"
+                    value={content.socials?.github || ''}
+                    onChange={(e) => updateSocial('github', e.target.value)}
+                    placeholder="https://github.com/Awoyelevictor"
+                    className="w-full px-4 py-3 bg-darkBg border border-white/10 rounded-xl text-sm text-textPrimary focus:border-accent focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-textSecondary uppercase tracking-wider mb-2 block">
+                    LinkedIn Profile URL
+                  </label>
+                  <input
+                    type="url"
+                    value={content.socials?.linkedin || ''}
+                    onChange={(e) => updateSocial('linkedin', e.target.value)}
+                    placeholder="https://linkedin.com/in/yourusername"
+                    className="w-full px-4 py-3 bg-darkBg border border-white/10 rounded-xl text-sm text-textPrimary focus:border-accent focus:outline-none"
                   />
                 </div>
               </div>
