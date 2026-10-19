@@ -71,7 +71,7 @@ const Hero = () => {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
             <span className="text-xs font-medium tracking-wide text-textSecondary">
-              Available for full-time & freelance projects
+              Open to collaborations & freelance projects
             </span>
           </motion.div>
 
@@ -136,8 +136,8 @@ const Hero = () => {
             </div>
             <div className="w-[1px] h-8 bg-white/10" />
             <div>
-              <div className="text-2xl sm:text-3xl font-bold text-accent">100%</div>
-              <div className="text-xs text-textMuted uppercase tracking-wider mt-0.5">Dedication</div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent">Purpose-first</div>
+              <div className="text-xs text-textMuted uppercase tracking-wider mt-0.5">Engineering Mindset</div>
             </div>
           </motion.div>
         </motion.div>
