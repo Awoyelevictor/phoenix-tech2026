@@ -1,6 +1,6 @@
-# Phoenix Tech — Victor Ayomide's Portfolio
+# Phoenix Tech — Awoyele Victor Ayomide's Portfolio
 
-Personal developer portfolio for **Awoyele Victor Ayomide**, a Computer Science student and software developer in Nigeria. The site presents selected projects, technical interests, and contact options.
+Personal developer portfolio for **Awoyele Victor Ayomide**, known online through the **Phoenix Tech** personal brand. Victor is a Computer Science student and software developer in Nigeria. The site presents selected projects, technical interests, and contact options.
 
 **Live portfolio:** https://phoenix-tech2026.onrender.com  
 **GitHub profile:** https://github.com/Awoyelevictor
