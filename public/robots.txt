@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://phoenix-tech2026.onrender.com/sitemap.xml
