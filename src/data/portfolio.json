@@ -3,11 +3,9 @@
   "username": "Awoyelevictor",
   "role": "Computer Science Student & Full-Stack Web Developer",
   "location": "Nigeria",
-
   "bio": "I’m Awoyele Victor Ayomide, a Computer Science student and software developer passionate about building practical, modern digital solutions.",
   "phone": "+2347017304536",
   "whatsapp": "https://wa.me/2347017304536",
-
   "about": {
     "headline": "Awoyele Victor Ayomide",
     "subtitle": "Computer Science Student & Software Developer",
@@ -31,7 +29,6 @@
       "description": "Fast-paced matches, chaotic gunfights, and just enough “one more game” energy to destroy a perfectly good sleep schedule. 😭🎮"
     }
   },
-
   "specialization": [
     "Web Development",
     "Frontend Development",
@@ -39,14 +36,12 @@
     "Artificial Intelligence",
     "Software Engineering"
   ],
-
   "socials": {
     "github": "https://github.com/Awoyelevictor",
     "whatsapp": "https://wa.me/2347017304536",
     "phone": "+2347017304536",
     "vercel": null
   },
-
   "technologies": {
     "frontend": [
       "React.js",
@@ -78,11 +73,24 @@
       "AI-assisted Applications"
     ]
   },
-
   "projects": [
     {
+      "name": "Eazy Pay VTU",
+      "description": "A VTU and bill-payment platform for airtime, mobile data, electricity, cable TV, and exam PIN purchases, with wallet funding and transaction flows.",
+      "technologies": [
+        "React",
+        "Vite",
+        "MongoDB",
+        "Paystack",
+        "REST APIs"
+      ],
+      "github": "https://github.com/Awoyelevictor/Eazy-pay-vtu",
+      "liveUrl": "https://eazy-pay-vtu-2.onrender.com/profile",
+      "featured": true
+    },
+    {
       "name": "Portfolio",
-      "description": "A personal portfolio website showcasing my skills, projects, experience, and development journey.",
+      "description": "A personal portfolio site created to showcase development work and technical interests.",
       "technologies": [
         "HTML",
         "CSS",
@@ -91,10 +99,9 @@
       "github": "https://github.com/Awoyelevictor/Portfolio",
       "vercel": null
     },
-
     {
       "name": "3D Website",
-      "description": "A modern interactive 3D web experience focused on immersive visual design and frontend development.",
+      "description": "An interactive web experience exploring 3D presentation and immersive frontend design.",
       "technologies": [
         "JavaScript",
         "Web Development",
@@ -103,10 +110,9 @@
       "github": "https://github.com/Awoyelevictor/3dwebsite",
       "vercel": null
     },
-
     {
       "name": "E-commerce App with AI",
-      "description": "An e-commerce web application exploring the integration of artificial intelligence into online shopping experiences.",
+      "description": "An e-commerce concept exploring how AI features can support a more helpful online-shopping experience.",
       "technologies": [
         "JavaScript",
         "AI",
@@ -116,10 +122,9 @@
       "github": "https://github.com/Awoyelevictor/E-commerce-App-with-AI",
       "vercel": null
     },
-
     {
       "name": "Health Management System",
-      "description": "A web-based health management application designed to organize health-related information and workflows.",
+      "description": "A React-based health-management interface built to organise health information and common workflow tasks.",
       "technologies": [
         "React.js",
         "Tailwind CSS"
@@ -127,10 +132,9 @@
       "github": "https://github.com/Awoyelevictor/hms",
       "vercel": null
     },
-
     {
       "name": "Inventory Management System",
-      "description": "A web application for managing products, inventory records, and stock-related operations.",
+      "description": "A web application for organising products and tracking inventory-related records and stock operations.",
       "technologies": [
         "React.js",
         "JavaScript",
@@ -139,10 +143,9 @@
       "github": "https://github.com/Awoyelevictor/inventory",
       "vercel": null
     },
-
     {
       "name": "VideoSense",
-      "description": "A web project focused on working with video-based functionality and digital media.",
+      "description": "A web project exploring video-related functionality and digital-media interactions.",
       "technologies": [
         "JavaScript",
         "Web Development"
@@ -150,10 +153,9 @@
       "github": "https://github.com/Awoyelevictor/VideoSense-",
       "vercel": null
     },
-
     {
       "name": "TaskWise",
-      "description": "A productivity-focused web application for organizing and managing tasks.",
+      "description": "A productivity web app focused on organising tasks and everyday work.",
       "technologies": [
         "JavaScript",
         "Web Development"
@@ -161,10 +163,9 @@
       "github": "https://github.com/Awoyelevictor/taskwise",
       "vercel": null
     },
-
     {
       "name": "Weather App",
-      "description": "A weather application that provides users with weather information through a simple web interface.",
+      "description": "A weather interface that presents forecast information through a web-based API workflow.",
       "technologies": [
         "JavaScript",
         "API",
@@ -173,10 +174,9 @@
       "github": "https://github.com/Awoyelevictor/weather4two",
       "vercel": null
     },
-
     {
       "name": "Terminal Portfolio",
-      "description": "A unique terminal-inspired portfolio experience designed around a command-line interface.",
+      "description": "A portfolio experiment that presents developer information through a terminal-inspired interface.",
       "technologies": [
         "JavaScript",
         "Terminal UI",
@@ -185,10 +185,9 @@
       "github": "https://github.com/Awoyelevictor/terminal-portfolio",
       "vercel": null
     },
-
     {
       "name": "Steps Tracker",
-      "description": "A web application for tracking walking activity and visualizing movement-related information.",
+      "description": "A web application experiment focused on walking activity and movement-related tracking.",
       "technologies": [
         "JavaScript",
         "Web Development",
@@ -198,15 +197,14 @@
       "vercel": null
     }
   ],
-
   "featuredProjects": [
+    "Eazy Pay VTU",
     "E-commerce App with AI",
     "Health Management System",
     "Inventory Management System",
     "3D Website",
     "Terminal Portfolio"
   ],
-
   "experience": {
     "role": "Web Development Intern",
     "focus": [
@@ -218,7 +216,6 @@
       "Web Application Development"
     ]
   },
-
   "careerGoals": [
     "Become a highly skilled full-stack developer",
     "Build impactful software products",
@@ -226,7 +223,6 @@
     "Solve real-world problems through technology",
     "Build scalable web applications"
   ],
-
   "interests": [
     "Software Development",
     "Artificial Intelligence",
@@ -235,7 +231,6 @@
     "Open Source",
     "Problem Solving"
   ],
-
   "availability": [
     "Freelance Projects",
     "Web Development",
