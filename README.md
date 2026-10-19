@@ -18,8 +18,9 @@ Personal developer portfolio for **Awoyele Victor Ayomide**, a Computer Science 
 
 ## Selected projects shown
 
-Project details and links are maintained in `src/data/portfolio.json`. The current gallery includes:
+Project details and links are maintained in `src/data/portfolio.json`. The current gallery includes 11 projects, including:
 
+- **Eazy Pay VTU** — a VTU and bill-payment platform for airtime, mobile data, electricity, cable TV, and exam PIN purchases, with wallet-funding and transaction flows
 - **E-commerce App with AI** — an exploration of AI in online shopping
 - **Health Management System** — a web application for health-related workflows
 - **Inventory Management System** — product and stock-management workflows
