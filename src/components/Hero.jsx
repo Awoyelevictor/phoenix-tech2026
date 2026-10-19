@@ -94,7 +94,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-base sm:text-lg text-textSecondary font-normal max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed"
           >
-            Hi, I'm <strong className="text-textPrimary font-semibold">Victor Awoyele</strong> — a Computer Science student and Full-Stack Web Developer specialized in React, modern JavaScript ecosystems, and intelligent AI integrations.
+            Hi, I'm <strong className="text-textPrimary font-semibold">Awoyele Victor Ayomide</strong> — a Computer Science student and software developer, known online through my personal brand <strong className="text-textPrimary font-semibold">Phoenix Tech</strong>. I build practical web projects and explore AI-powered solutions.
           </motion.p>
 
           {/* CTA Buttons */}
