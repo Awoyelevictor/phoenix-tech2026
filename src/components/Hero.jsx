@@ -82,9 +82,9 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.15 }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-textPrimary mb-6"
           >
-            Crafting Scalable <br className="hidden sm:inline" />
-            <span className="text-gradient-accent">Web Experiences</span> <br />
-            & AI Solutions
+            Awoyele Victor Ayomide <br className="hidden sm:inline" />
+            <span className="text-gradient-accent">Software Development</span> <br />
+            & AI Projects
           </motion.h1>
 
           {/* Subtitle */}
