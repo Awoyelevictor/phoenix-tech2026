@@ -1,16 +1,16 @@
 {
   "name": "Awoyele Victor Ayomide",
   "username": "Awoyelevictor",
-  "role": "Computer Science Student & Full-Stack Web Developer",
+  "role": "Computer Science student & software developer",
   "location": "Nigeria",
-  "bio": "I’m Awoyele Victor Ayomide, a Computer Science student and software developer passionate about building practical, modern digital solutions.",
+  "bio": "I’m Awoyele Victor Ayomide, a Computer Science student and software developer in Nigeria, sharing my work through my personal brand, Phoenix Tech.",
   "phone": "+2347017304536",
   "whatsapp": "https://wa.me/2347017304536",
   "about": {
     "headline": "Awoyele Victor Ayomide",
-    "subtitle": "Computer Science Student & Software Developer",
+    "subtitle": "Computer Science Student & Software Developer | Phoenix Tech",
     "paragraphs": [
-      "I’m Awoyele Victor Ayomide, a Computer Science student and software developer passionate about building practical, modern digital solutions.",
+      "I’m Awoyele Victor Ayomide, a Computer Science student and software developer who shares practical projects and technical experiments through my personal brand, Phoenix Tech.",
       "My main focus is frontend development, where I work with technologies like React.js, JavaScript, Tailwind CSS, and modern web APIs to create responsive and user-friendly experiences. I also enjoy working with Node.js, Laravel, MongoDB, MySQL, and REST APIs to understand and build complete systems beyond the interface.",
       "I’m particularly interested in Artificial Intelligence, Natural Language Processing, and Cybersecurity. I enjoy exploring how AI can solve real-world problems and how secure, intelligent systems can make technology more accessible and useful.",
       "I believe good software should not only look good — it should solve a real problem, work reliably, and be built with purpose. I’m constantly learning, experimenting with new technologies, and turning ideas into working projects."
@@ -236,5 +236,6 @@
     "Web Development",
     "Collaborations",
     "Software Projects"
-  ]
+  ],
+  "alias": "Phoenix Tech"
 }
