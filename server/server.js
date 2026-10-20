@@ -19,11 +19,33 @@ import adminRoutes from './routes/admin.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// Path to the built React frontend (one level up from /server, then /dist)
 const distPath = path.join(__dirname, '..', 'dist');
 
-// CORS Whitelist Configuration
+// Explicit crawler files ensure Google receives the intended files from the
+// built frontend, with no accidental application-level blocking rule.
+app.get('/robots.txt', (req, res) => {
+  res.set('Content-Type', 'text/plain; charset=utf-8');
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.status(200).send(
+    'User-agent: *\nAllow: /\n\nSitemap: https://phoenix-tech2026.onrender.com/sitemap.xml\n'
+  );
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.set('Content-Type', 'application/xml; charset=utf-8');
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.status(200).send(
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    '  <url>\n' +
+    '    <loc>https://phoenix-tech2026.onrender.com/</loc>\n' +
+    '    <lastmod>2026-10-20</lastmod>\n' +
+    '  </url>\n' +
+    '</urlset>\n'
+  );
+});
+
+// CORS configuration
 const defaultAllowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
@@ -43,12 +65,9 @@ const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigi
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. mobile apps, curl, or same-origin direct requests)
     if (!origin) return callback(null, true);
-
-    // Allow configured whitelist origins, wildcard, render deployments, vercel, or localhost
     if (
-      allowedOrigins.includes(origin) || 
+      allowedOrigins.includes(origin) ||
       allowedOrigins.includes('*') ||
       origin.endsWith('.onrender.com') ||
       origin.endsWith('.vercel.app') ||
@@ -57,8 +76,6 @@ const corsOptions = {
     ) {
       return callback(null, true);
     }
-
-    // Default permissive for portfolio visitors to prevent breaking public API
     return callback(null, true);
   },
   credentials: true,
@@ -81,13 +98,11 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Health check route
 app.get('/api/ping', (req, res) => {
   res.json({ message: 'Portfolio API Online', timestamp: new Date() });
 });
 
-// For any client-side SPA navigation routes, send back index.html
-// In Express 5, /{splat} or /{*splat} captures all non-API paths
+// React SPA fallback
 app.get('/{*splat}', (req, res, next) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/assets')) {
     return next();
@@ -95,7 +110,7 @@ app.get('/{*splat}', (req, res, next) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   if (err && err.message && err.message.startsWith('CORS blocked')) {
     return res.status(403).json({ error: err.message });
@@ -111,6 +126,6 @@ mongoose.connect(mongoUri)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch((err) => console.error('❌ MongoDB connection error:', err.message));
 
-app.listen(PORT, () => {
-  console.log(`🚀 Portfolio server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Portfolio server running on port ${PORT}`);
 });
