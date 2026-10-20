@@ -104,6 +104,15 @@ app.get('/sitemap.xml', (req, res) => {
   );
 });
 
+// Explicitly serve crawler files before static middleware.
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').sendFile(path.join(distPath, 'robots.txt'));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml').sendFile(path.join(distPath, 'sitemap.xml'));
+});
+
 // Serve static files from the React build
 app.use(express.static(distPath));
 
