@@ -88,6 +88,22 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Serve crawler directives directly so they never depend on the frontend build.
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').set('Cache-Control', 'no-cache, no-store, must-revalidate').send(
+    'User-agent: *\nAllow: /\n\nUser-agent: Googlebot\nAllow: /\n\nSitemap: https://phoenix-tech2026.onrender.com/sitemap.xml\n'
+  );
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml').set('Cache-Control', 'no-cache, no-store, must-revalidate').send(
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    '  <url><loc>https://phoenix-tech2026.onrender.com/</loc></url>\n' +
+    '</urlset>'
+  );
+});
+
 // Serve static files from the React build
 app.use(express.static(distPath));
 
